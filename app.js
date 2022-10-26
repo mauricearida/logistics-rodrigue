@@ -21,6 +21,10 @@ mongoose
 app.use(cors());
 app.use(express.json());
 
+app.get("/getme", (req, res) => {
+  res.json("hh11");
+});
+
 app.use("/api/auth", authRoute);
 
 app.listen(process.env.PORT || 5000, () => {
