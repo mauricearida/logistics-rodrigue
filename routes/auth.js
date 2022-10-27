@@ -5,20 +5,24 @@ const jwt = require("jsonwebtoken");
 
 //REGISTER
 router.post("/register", async (req, res) => {
-  const { name, staffid, password, email, phonenumber, role } = req.body;
+  const { name, email, phonenumber } = req.body;
   const newUser = new User({
     name: name,
     email: email,
-    staffid: staffid,
     phonenumber: phonenumber,
-    role: role,
-    password: CryptoJS.AES.encrypt(password, process.env.PASS_SEC).toString(),
+    password: CryptoJS.AES.encrypt(
+      req.body.password,
+      process.env.PASS_SEC
+    ).toString(),
   });
-
   try {
+    console.log("2222");
     const savedUser = await newUser.save();
+    console.log("5555");
+
     res.status(201).json(savedUser);
   } catch (err) {
+    console.log(err);
     res.status(500).json(err);
   }
 });
@@ -28,7 +32,7 @@ router.post("/register", async (req, res) => {
 router.post("/login", async (req, res) => {
   try {
     const user = await User.findOne({
-      userName: req.body.user_name,
+      name: req.body.name,
     });
 
     !user && res.status(401).json("Wrong User Name");
@@ -57,6 +61,7 @@ router.post("/login", async (req, res) => {
     const { password, ...others } = user._doc;
     res.status(200).json({ ...others, accessToken });
   } catch (err) {
+    console.log(err);
     res.status(500).json(err);
   }
 });

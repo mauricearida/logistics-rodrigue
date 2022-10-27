@@ -11,13 +11,17 @@ dotenv.config();
 const MONGO_URL =
   "mongodb+srv://maurice:mcOWRMghRSo8ljYf@cluster0.zqnfjtu.mongodb.net/?retryWrites=true&w=majority";
 
-mongoose
-  .connect(MONGO_URL)
-  .then(() => console.log("DB Connection Successfull!"))
-  .catch((err) => {
-    console.log(err);
-  });
+const connectWithRetry = () => {
+  mongoose
+    .connect(MONGO_URL)
+    .then(() => console.log("DB Connection Successfull!"))
+    .catch((err) => {
+      console.log(err);
+      setTimeout(connectWithRetry, 5000);
+    });
+};
 
+connectWithRetry();
 app.use(cors());
 app.use(express.json());
 
