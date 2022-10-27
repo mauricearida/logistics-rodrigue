@@ -58,6 +58,12 @@ router.post("/login", async (req, res) => {
       { expiresIn: "3d" }
     );
 
+    let AuDate = new Date().toLocaleString("en-US", {
+      timeZone: "Australia/Sydney",
+    });
+
+    user.lastlogin = AuDate;
+
     const { password, ...others } = user._doc;
     res.status(200).json({ ...others, accessToken });
   } catch (err) {
