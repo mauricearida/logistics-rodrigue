@@ -3,15 +3,18 @@ const User = require("../models/User");
 const CryptoJS = require("crypto-js");
 const jwt = require("jsonwebtoken");
 
+email;
+
 //REGISTER
 router.post("/register", async (req, res) => {
+  const { name, staffid, password, email, phonenumber, role } = req.body;
   const newUser = new User({
-    username: req.body.username,
-    email: req.body.email,
-    password: CryptoJS.AES.encrypt(
-      req.body.password,
-      process.env.PASS_SEC
-    ).toString(),
+    name: name,
+    email: email,
+    staffid: staffid,
+    phonenumber: phonenumber,
+    role: role,
+    password: CryptoJS.AES.encrypt(password, process.env.PASS_SEC).toString(),
   });
 
   try {
@@ -46,7 +49,8 @@ router.post("/login", async (req, res) => {
     const accessToken = jwt.sign(
       {
         id: user._id,
-        isAdmin: user.isAdmin,
+        role: user.role,
+        // isAdmin: user.isAdmin,
       },
       process.env.JWT_SEC,
       { expiresIn: "3d" }

@@ -8,7 +8,10 @@ const UserSchema = new mongoose.Schema(
     staffid: { type: Number, required: true, unique: true },
     phonenumber: { type: String, required: true, unique: true },
     lastlogin: { type: Date },
-    isAdmin: { type: Boolean, default: false },
+    role: { type: Number, required: true, default: 0 },
+    // 0 = admin
+    // 1 = user
+    // 2 = driver (does not user the website)
   },
   { timestamps: true }
 );
