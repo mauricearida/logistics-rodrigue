@@ -4,6 +4,8 @@ const mongoose = require("mongoose");
 const dotenv = require("dotenv");
 const authRoute = require("./routes/auth");
 const usersRoute = require("./routes/user");
+const productsRoute = require("./routes/products");
+const categoriesRoute = require("./routes/category");
 
 const cors = require("cors");
 
@@ -28,7 +30,16 @@ app.use(express.json());
 
 app.use("/api/auth", authRoute);
 app.use("/api/users", usersRoute);
+app.use("/api/categories", categoriesRoute);
+app.use("/api/products", productsRoute);
 
 app.listen(process.env.PORT || 5000, () => {
   console.log("Backend server is running!");
 });
+
+// 200 : OK
+// 201 : CREATED
+// 400 : BAD REQUEST
+// 401 : UNAUTHORIZED
+// 403 : FORBIDDEN
+// 404 : NOT FOUND
