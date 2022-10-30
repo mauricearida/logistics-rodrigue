@@ -2,6 +2,7 @@ const express = require("express");
 const app = express();
 const mongoose = require("mongoose");
 const dotenv = require("dotenv");
+const bodyParser = require("body-parser");
 const authRoute = require("./routes/auth");
 const usersRoute = require("./routes/user");
 const productsRoute = require("./routes/products");

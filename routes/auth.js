@@ -12,7 +12,7 @@ const router = require("express").Router();
 
 //REGISTER
 router.post("/register", validateUserSignup, validate, async (req, res) => {
-  const { name, email, phonenumber } = req.body;
+  const { name, email, phonenumber, username } = req.body;
 
   //check if email is duplicate
   const isNewEmailUser = await User.isThisEmailInUse(email);
@@ -22,17 +22,18 @@ router.post("/register", validateUserSignup, validate, async (req, res) => {
       message: "This email is already in use, try sign-in with a different one",
     });
   //check if name is duplicate
-  const isNewNameUser = await User.isThisNameInUse(name);
-  console.log(`isNewNameUser`, isNewNameUser);
-  if (!isNewNameUser)
+  const isNewUsername = await User.isThisUsernameInUse(username);
+  console.log(`isNewUsername`, isNewUsername);
+  if (!isNewUsername)
     return res.status(400).json({
       success: false,
       message:
-        "This name is already in use, please sign in with a different name",
+        "This name is already in use, please sign in with a different username",
     });
 
   const newUser = new User({
     name: name,
+    username: username,
     email: email,
     phonenumber: phonenumber,
     password: CryptoJS.AES.encrypt(
@@ -41,9 +42,20 @@ router.post("/register", validateUserSignup, validate, async (req, res) => {
     ).toString(),
   });
   try {
-    const savedUser = await newUser.save();
+    let savedUser = await newUser.save();
 
-    res.status(201).json(savedUser);
+    const accessToken = jwt.sign(
+      {
+        id: savedUser._id,
+        role: savedUser.role,
+      },
+      process.env.JWT_SEC,
+      { expiresIn: "3d" }
+    );
+
+    savedUser = savedUser.toObject(); // swap for a plain javascript object instance
+    delete savedUser["lastlogin"];
+    res.status(200).json({ ...savedUser, accessToken });
   } catch (err) {
     console.log(err);
     res.status(500).json(err);
@@ -54,10 +66,10 @@ router.post("/register", validateUserSignup, validate, async (req, res) => {
 router.post("/login", validateUserLogin, validate, async (req, res) => {
   try {
     const user = await User.findOne({
-      name: req.body.name,
+      username: req.body.username,
     });
 
-    !user && res.status(401).json("Wrong User Name");
+    !user && res.status(401).json("Wrong Username");
 
     const hashedPassword = CryptoJS.AES.decrypt(
       user.password,
@@ -87,7 +99,9 @@ router.post("/login", validateUserLogin, validate, async (req, res) => {
 
     const { password, ...others } = user._doc;
     res.status(200).json({ ...others, accessToken });
+    console.log("111");
   } catch (err) {
+    console.log("222");
     console.log(err);
     res.status(500).json(err);
   }

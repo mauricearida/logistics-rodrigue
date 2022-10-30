@@ -4,7 +4,6 @@ const Category = require("../models/Category");
 const router = require("express").Router();
 
 //CREATE
-
 router.post("/", verifyTokenAndAdmin, async (req, res) => {
   const newCategory = new Category(req.body);
   if (req.body.name) {

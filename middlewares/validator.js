@@ -9,6 +9,13 @@ exports.validateUserSignup = [
     .withMessage("Name is missing")
     .isLength({ min: 3, max: 20 })
     .withMessage("Invalid name, name must be 3 to 20 characaters long"),
+  check("username")
+    .trim()
+    .not()
+    .isEmpty()
+    .withMessage("Username is missing")
+    .isLength({ min: 3, max: 20 })
+    .withMessage("Invalid username, name must be 3 to 20 characaters long"),
   check("email").isEmail().withMessage("Email is Invalid"),
   check("password")
     .trim()
@@ -25,13 +32,13 @@ exports.validateUserSignup = [
 ];
 
 exports.validateUserLogin = [
-  check("name")
+  check("username")
     .trim()
     .not()
     .isEmpty()
-    .withMessage("Name is missing")
+    .withMessage("Username is missing")
     .isLength({ min: 3, max: 20 })
-    .withMessage("Invalid name, name must be 3 to 20 characaters long"),
+    .withMessage("Invalid username, username must be 3 to 20 characaters long"),
   check("password")
     .trim()
     .not()

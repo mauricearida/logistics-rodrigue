@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 const UserSchema = new mongoose.Schema(
   {
     name: { type: String, required: true },
+    username: { type: String, required: true, unique: true },
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
     phonenumber: { type: String, required: true, unique: true },
@@ -27,14 +28,14 @@ UserSchema.statics.isThisEmailInUse = async function (email) {
   }
 };
 
-UserSchema.statics.isThisNameInUse = async function (name) {
-  if (!name) throw new Error("Please enter your name");
+UserSchema.statics.isThisUsernameInUse = async function (name) {
+  if (!name) throw new Error("Please enter your username");
   try {
     const user = await this.findOne({ name });
     if (user) return false;
     return true;
   } catch (error) {
-    console.error(`error inside isThisNameInUse method`, error.emssage);
+    console.error(`error inside isThisUsernameInUse method`, error.emssage);
     return false;
   }
 };

@@ -7,6 +7,7 @@ const {
 
 const router = require("express").Router();
 
+//
 //CREATE
 router.post(
   "/",
@@ -18,17 +19,16 @@ router.post(
       categoryId,
       unitesperbox,
       prioritynumber,
-      visibility,
+
       price,
     } = req.body;
-    if (
-      !name ||
-      !categoryId ||
-      !unitesperbox ||
-      !prioritynumber ||
-      !visibility ||
-      !price
-    ) {
+    if (!name || !categoryId || !unitesperbox || !prioritynumber || !price) {
+      console.log("name", !name);
+      console.log("categoryId", !categoryId);
+      console.log("unitesperbox", !unitesperbox);
+      console.log("prioritynumber", !prioritynumber);
+
+      console.log("price", !price);
       return res.status(400).json("Please fill in all the fields");
     } else {
       const newProduct = new Product(req.body);
@@ -92,28 +92,46 @@ router.get("/find/:id", validateMongoId, async (req, res) => {
 });
 
 //GET ALL PRODUCTS
-router.get("/", async (req, res) => {
-  const qNew = req.query.new;
-  const qCategory = req.query.category;
-  try {
-    let products;
+//  /api/products
+// for pagination :
+// /api/products?page=1&limit=2
 
-    if (qNew) {
-      products = await Product.find().sort({ createdAt: -1 }).limit(1);
-    } else if (qCategory) {
-      products = await Product.find({
-        categories: {
-          $in: [qCategory],
-        },
-      });
-    } else {
-      products = await Product.find();
-    }
+router.get("/", async (req, res) => {
+  try {
+    const { page = 1, limit = 5 } = req.query;
+    const products = await Product.find()
+      .limit(limit * 1)
+      .skip((page - 1) * limit);
 
     res.status(200).json(products);
   } catch (err) {
     res.status(500).json(err);
   }
 });
+
+// router.get("/", async (req, res) => {
+//   const qNew = req.query.new;
+//   const qCategory = req.query.category;
+
+//   try {
+//     let products;
+
+//     if (qNew) {
+//       products = await Product.find().sort({ createdAt: -1 }).limit(1);
+//     } else if (qCategory) {
+//       products = await Product.find({
+//         categories: {
+//           $in: [qCategory],
+//         },
+//       });
+//     } else {
+//       products = await Product.find();
+//     }
+
+//     res.status(200).json(products);
+//   } catch (err) {
+//     res.status(500).json(err);
+//   }
+// });
 
 module.exports = router;

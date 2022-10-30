@@ -11,7 +11,7 @@ const ProductSchema = new mongoose.Schema(
     price: { type: Number, required: true },
     unitesperbox: { type: Number, required: true },
     prioritynumber: { type: Number, required: true },
-    visibility: { type: Boolean, required: true },
+    visibility: { type: Boolean, default: true },
     // false = not available
     // true = visible
   },

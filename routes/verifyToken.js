@@ -19,17 +19,19 @@ const verifyTokenAndAuthorization = (req, res, next) => {
     if (req.user.id === req.params.id || req.user.role == 1) {
       next();
     } else {
-      res.status(403).json("You are not alowed to do that!");
+      res.status(403).json("You should be an admin to do that!");
     }
   });
 };
 
 const verifyTokenAndAdmin = (req, res, next) => {
+  let token = req.headers.token;
+  if (!token) return res.status(404).json("Only admins can do that !");
   verifyToken(req, res, () => {
     if (req.user.role == 1) {
       next();
     } else {
-      res.status(403).json("You are not alowed to do that!");
+      res.status(403).json("Only admins can do such operations!");
     }
   });
 };
