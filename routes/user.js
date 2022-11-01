@@ -60,15 +60,17 @@ router.delete(
 
 //GET USER
 router.get(
-  "/find/:id",
+  "/:id",
   verifyTokenAndAuthorization,
   validateMongoId,
   async (req, res) => {
     try {
       const user = await User.findById(req.params.id);
+      if (!user) return res.status(200).json("No User was found by this id");
       const { password, ...others } = user._doc;
       res.status(200).json(others);
     } catch (err) {
+      console.log(err);
       res.status(500).json(err);
     }
   }

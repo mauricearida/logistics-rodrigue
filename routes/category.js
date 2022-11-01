@@ -57,7 +57,7 @@ router.delete(
 );
 
 //GET Category
-router.get("/find/:id", validateMongoId, async (req, res) => {
+router.get("/:id", validateMongoId, async (req, res) => {
   try {
     const category = await Category.findById(req.params.id);
     res.status(200).json(category);

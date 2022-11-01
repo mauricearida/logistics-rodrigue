@@ -1,4 +1,5 @@
 const Product = require("../models/Products");
+const Productcount = require("../models/Productscount");
 const { verifyTokenAndAdmin } = require("./verifyToken");
 const {
   validateMongoId,
@@ -7,28 +8,65 @@ const {
 
 const router = require("express").Router();
 
-//
+async function changeProductCount(indicator) {
+  try {
+    let currentProductCount = await Productcount.findById(
+      "636103a47fdf2224276ae65d"
+    );
+    let newOne =
+      indicator === "increase"
+        ? currentProductCount.count + 1
+        : currentProductCount.count - 1;
+
+    let updatedProductCount = await Productcount.findByIdAndUpdate(
+      "636103a47fdf2224276ae65d",
+      {
+        $set: { count: newOne },
+      },
+      { new: true }
+    );
+
+    console.log(`changed product counter for ${updatedProductCount}`);
+  } catch (err) {
+    console.log(`err`, err);
+    res.status(500).json(err);
+  }
+}
+
+router.put(
+  "/updatecount",
+  verifyTokenAndAdmin,
+
+  async (req, res) => {
+    try {
+      let currentProductCount = await Productcount.findById(
+        "636103a47fdf2224276ae65d"
+      );
+
+      let updatedProductCount = await Productcount.findByIdAndUpdate(
+        "636103a47fdf2224276ae65d",
+        {
+          $set: { count: currentProductCount.count + 1 },
+        },
+        { new: true }
+      );
+      console.log(`updatedProductCount`, updatedProductCount);
+      res.status(200).json(updatedProductCount);
+    } catch (err) {
+      console.log(`err`, err);
+      res.status(500).json(err);
+    }
+  }
+);
+
 //CREATE
 router.post(
   "/",
   verifyTokenAndAdmin,
   validateMongoCategoryId,
   async (req, res) => {
-    const {
-      name,
-      categoryId,
-      unitesperbox,
-      prioritynumber,
-
-      price,
-    } = req.body;
+    const { name, categoryId, unitesperbox, prioritynumber, price } = req.body;
     if (!name || !categoryId || !unitesperbox || !prioritynumber || !price) {
-      console.log("name", !name);
-      console.log("categoryId", !categoryId);
-      console.log("unitesperbox", !unitesperbox);
-      console.log("prioritynumber", !prioritynumber);
-
-      console.log("price", !price);
       return res.status(400).json("Please fill in all the fields");
     } else {
       const newProduct = new Product(req.body);
@@ -41,6 +79,9 @@ router.post(
             .json("a product with this name has been created");
         } else {
           const savedProduct = await newProduct.save();
+          if (savedProduct) {
+            changeProductCount("increase");
+          }
           res.status(200).json(savedProduct);
         }
       } catch (err) {
@@ -82,7 +123,7 @@ router.delete(
 );
 
 //GET PRODUCT
-router.get("/find/:id", validateMongoId, async (req, res) => {
+router.get("/:id", validateMongoId, async (req, res) => {
   try {
     const product = await Product.findById(req.params.id);
     res.status(200).json(product);
@@ -98,12 +139,19 @@ router.get("/find/:id", validateMongoId, async (req, res) => {
 
 router.get("/", async (req, res) => {
   try {
+    //let productsCount = await Product.estimatedDocumentCount({}).exec();
+    // console.log(productcount);
+
     const { page = 1, limit = 5 } = req.query;
+    let currentProductCount = await Productcount.findById(
+      "636103a47fdf2224276ae65d"
+    );
+    console.log(currentProductCount);
     const products = await Product.find()
       .limit(limit * 1)
       .skip((page - 1) * limit);
 
-    res.status(200).json(products);
+    res.status(200).json({ productCount: currentProductCount.count, products });
   } catch (err) {
     res.status(500).json(err);
   }

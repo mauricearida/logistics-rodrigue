@@ -2,7 +2,12 @@ const mongoose = require("mongoose");
 
 const CostumerSchema = new mongoose.Schema(
   {
-    isactive: { type: Boolean, required: true },
+    isactive: { type: Boolean, required: true, default: true },
+    // pendingorders: {
+    //   type: mongoose.Schema.Types.ObjectId,
+    //   ref: "Order",
+    //   default: null,
+    // },
     businessname: { type: String, required: true },
     abn: { type: Number, required: true, unique: true },
     deliveryaddress: { type: String, required: true },
@@ -10,6 +15,7 @@ const CostumerSchema = new mongoose.Schema(
     deliveryaddress2: { type: String },
     suburb: { type: String, required: true },
     state: { type: String, required: true },
+    status: { type: Boolean, required: true, default: false },
     postcode: { type: Number, required: true },
     notes: { type: String },
     firstname: { type: String, required: true },
@@ -21,9 +27,9 @@ const CostumerSchema = new mongoose.Schema(
     howoftendeliveriesoccur: { type: Number, required: true },
     reminderorderconfirmationbydays: { type: Number },
     deliveryday: { type: String },
-    deliverytime: { type: String },
-    deliverytimerange: { type: String },
-    defaultpaymentmethod: { type: Number, required: true },
+    deliverystarttime: { type: String },
+    deliverytotime: { type: String },
+    paymentmethod: { type: Number, required: true },
     consolidatedbiller: { type: Boolean },
     billerforcostumer: { type: Number },
     haspromotion: { type: Boolean, required: true, default: false },
