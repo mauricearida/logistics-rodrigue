@@ -67,7 +67,6 @@ router.post(
     let codeid = codeSequence.costumercodeid;
     console.log("codeid", codeid);
     newCostumer.codeid = codeid;
-    //Sharedrecords.costumercodeid;
     try {
       const savedCostumer = await newCostumer.save();
       res.status(200).json(savedCostumer);
@@ -79,7 +78,6 @@ router.post(
         },
         { new: true }
       );
-
       console.log("updatedOcdeSequence", updatedOcdeSequence);
     } catch (err) {
       console.log(`err`, err);
@@ -129,15 +127,17 @@ router.get("/:id", validateMongoId, async (req, res) => {
   }
 });
 
-//GET ALL Costumers
 router.get("/", verifyTokenAndAdmin, async (req, res) => {
   try {
-    const { page, limit } = req.query;
+    const { page, limit, isarchived } = req.query;
     if (!page || !limit)
       return res
         .status(400)
-        .json("the required query parameters are : page and limit");
-    const costumers = await Costumer.find()
+        .json(
+          "the required query parameters are : page and limit, and archived is optional"
+        );
+
+    const costumers = await Costumer.find({ isarchived: isarchived })
       .limit(limit * 1)
       .skip((page - 1) * limit);
 
