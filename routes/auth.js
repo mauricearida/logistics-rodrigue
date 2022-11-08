@@ -6,13 +6,13 @@ const {
   validateUserSignup,
   validateUserLogin,
   validate,
-} = require("../middlewares/validator");
+} = require("../middlewares/validators");
 
 const router = require("express").Router();
 
 //REGISTER
 router.post("/register", validateUserSignup, validate, async (req, res) => {
-  const { name, email, phonenumber, username } = req.body;
+  const { name, email, phonenumber, username, lastlogin, role } = req.body;
 
   //check if email is duplicate
   const isNewEmailUser = await User.isThisEmailInUse(email);
@@ -36,6 +36,8 @@ router.post("/register", validateUserSignup, validate, async (req, res) => {
     username: username,
     email: email,
     phonenumber: phonenumber,
+    lastlogin: lastlogin,
+    role: role,
     password: CryptoJS.AES.encrypt(
       req.body.password,
       process.env.PASS_SEC
@@ -53,9 +55,10 @@ router.post("/register", validateUserSignup, validate, async (req, res) => {
       { expiresIn: "3d" }
     );
 
-    savedUser = savedUser.toObject(); // swap for a plain javascript object instance
-    delete savedUser["lastlogin"];
-    res.status(200).json({ ...savedUser, accessToken });
+    // savedUser = savedUser.toObject(); // swap for a plain javascript object instance
+    // delete savedUser["lastlogin"];
+    // res.status(200).json({ ...savedUser, accessToken });
+    res.status(200).json({ savedUser, accessToken });
   } catch (err) {
     console.log(err);
     res.status(500).json(err);
@@ -69,7 +72,7 @@ router.post("/login", validateUserLogin, validate, async (req, res) => {
       username: req.body.username,
     });
 
-    !user && res.status(401).json("Wrong Username");
+    if (!user) return res.status(401).json("Wrong Username");
 
     const hashedPassword = CryptoJS.AES.decrypt(
       user.password,
@@ -90,18 +93,13 @@ router.post("/login", validateUserLogin, validate, async (req, res) => {
       process.env.JWT_SEC,
       { expiresIn: "3d" }
     );
-
     // let AuDate = new Date().toLocaleString("en-US", {
     //   timeZone: "Australia/Sydney",
     // });
-
     user.lastlogin = Date.now();
-
     const { password, ...others } = user._doc;
-    res.status(200).json({ ...others, accessToken });
-    console.log("111");
+    return res.status(200).json({ ...others, accessToken });
   } catch (err) {
-    console.log("222");
     console.log(err);
     res.status(500).json(err);
   }

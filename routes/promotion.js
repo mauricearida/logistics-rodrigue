@@ -1,30 +1,34 @@
 const { verifyTokenAndAdmin } = require("./verifyToken");
-const { validateMongoId } = require("../middlewares/validators");
-const Category = require("../models/Category");
+const {
+  validateMongoId,
+  validateCreatingPromotion,
+} = require("../middlewares/validators");
+const Promotion = require("../models/Promotion");
 const router = require("express").Router();
 
-// 6364e4756a334d5fb98a79aa
+// {
+//     "name": "promotion name",
+//     "description": "description name",
+//     "from": "2022-07-21T00:00:00.000Z",
+//     "to": "2021-07-21T00:00:00.000Z"
+// }
+
 //CREATE
-router.post("/", verifyTokenAndAdmin, async (req, res) => {
-  const newCategory = new Category(req.body);
-  if (req.body.name) {
+router.post(
+  "/",
+  verifyTokenAndAdmin,
+  validateCreatingPromotion,
+  async (req, res) => {
+    const newPromotion = new Promotion(req.body);
     try {
-      const categoryName = await Category.findOne({ name: req.body.name });
-      if (categoryName) {
-        return res
-          .status(401)
-          .json("A category with this name has been created");
-      } else {
-        const savedCategory = await newCategory.save();
-        res.status(200).json(savedCategory);
-      }
+      const savedPromotion = await newPromotion.save();
+      res.status(200).json(savedPromotion);
     } catch (err) {
+      console.log(`err`, err);
       res.status(500).json(err);
     }
-  } else {
-    return res.status(400).json("A category name is required");
   }
-});
+);
 
 //UPDATE
 router.put("/:id", verifyTokenAndAdmin, validateMongoId, async (req, res) => {
@@ -80,5 +84,4 @@ router.get("/", async (req, res) => {
     res.status(500).json(err);
   }
 });
-
 module.exports = router;

@@ -5,7 +5,9 @@ const verifyToken = (req, res, next) => {
   if (authHeader) {
     const token = authHeader.split(" ")[1];
     jwt.verify(token, process.env.JWT_SEC, (err, user) => {
-      if (err) res.status(403).json("Token is not valid!");
+      //i pesonally added the return in the line below
+      if (err)
+        return res.status(401).json("Your session is over, please login again");
       req.user = user;
       next();
     });
@@ -28,7 +30,7 @@ const verifyTokenAndAdmin = (req, res, next) => {
   let token = req.headers.token;
   if (!token) return res.status(404).json("Only admins can do that !");
   verifyToken(req, res, () => {
-    if (req.user.role == 1) {
+    if (req.user.role && req.user.role == 1) {
       next();
     } else {
       res.status(403).json("Only admins can do such operations!");

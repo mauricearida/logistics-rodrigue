@@ -2,7 +2,7 @@ const {
   verifyTokenAndAuthorization,
   verifyTokenAndAdmin,
 } = require("./verifyToken");
-const { validateMongoId } = require("../middlewares/validator");
+const { validateMongoId } = require("../middlewares/validators");
 const User = require("../models/User");
 
 const CryptoJS = require("crypto-js");

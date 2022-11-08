@@ -1,37 +1,37 @@
 const Product = require("../models/Products");
-const Productcount = require("../models/Productscount");
+//const Sharedrecords = require("../models/Sharedrecords");
 const { verifyTokenAndAdmin } = require("./verifyToken");
 const {
   validateMongoId,
   validateMongoCategoryId,
-} = require("../middlewares/validator");
+} = require("../middlewares/validators");
 
 const router = require("express").Router();
 
-async function changeProductCount(indicator) {
-  try {
-    let currentProductCount = await Productcount.findById(
-      "636103a47fdf2224276ae65d"
-    );
-    let newOne =
-      indicator === "increase"
-        ? currentProductCount.count + 1
-        : currentProductCount.count - 1;
+// async function changeProductCount(indicator) {
+//   try {
+//     let currentProductCount = await Sharedrecords.findById(
+//       "636103a47fdf2224276ae65d"
+//     );
+//     let newOne =
+//       indicator === "increase"
+//         ? currentProductCount.count + 1
+//         : currentProductCount.count - 1;
 
-    let updatedProductCount = await Productcount.findByIdAndUpdate(
-      "636103a47fdf2224276ae65d",
-      {
-        $set: { count: newOne },
-      },
-      { new: true }
-    );
+//     let updatedProductCount = await Sharedrecords.findByIdAndUpdate(
+//       "636103a47fdf2224276ae65d",
+//       {
+//         $set: { productcount: newOne },
+//       },
+//       { new: true }
+//     );
 
-    console.log(`changed product counter for ${updatedProductCount}`);
-  } catch (err) {
-    console.log(`err`, err);
-    res.status(500).json(err);
-  }
-}
+//     console.log(`changed product counter for ${updatedProductCount}`);
+//   } catch (err) {
+//     console.log(`err`, err);
+//     res.status(500).json(err);
+//   }
+// }
 
 router.put(
   "/updatecount",
@@ -139,19 +139,13 @@ router.get("/:id", validateMongoId, async (req, res) => {
 
 router.get("/", async (req, res) => {
   try {
-    //let productsCount = await Product.estimatedDocumentCount({}).exec();
-    // console.log(productcount);
-
+    let productsCount = await Product.count({}).exec();
     const { page = 1, limit = 5 } = req.query;
-    let currentProductCount = await Productcount.findById(
-      "636103a47fdf2224276ae65d"
-    );
-    console.log(currentProductCount);
     const products = await Product.find()
       .limit(limit * 1)
       .skip((page - 1) * limit);
 
-    res.status(200).json({ productCount: currentProductCount.count, products });
+    res.status(200).json({ productsCount, products });
   } catch (err) {
     res.status(500).json(err);
   }
