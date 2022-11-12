@@ -127,16 +127,16 @@ router.get("/:id", validateMongoId, async (req, res) => {
   }
 });
 
+// api/costumers?page=1&limit=9&isarchived=false
 router.get("/", verifyTokenAndAdmin, async (req, res) => {
   try {
     const { page, limit, isarchived } = req.query;
-    if (!page || !limit)
+    if (!page || !limit || !isarchived)
       return res
         .status(400)
         .json(
-          "the required query parameters are : page and limit, and archived is optional"
+          "the required query parameters are : page and limit and isarchived"
         );
-
     const costumers = await Costumer.find({ isarchived: isarchived })
       .limit(limit * 1)
       .skip((page - 1) * limit);

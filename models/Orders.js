@@ -7,26 +7,24 @@ const OrderSchema = new mongoose.Schema(
       ref: "Costumer",
       required: true,
     },
-    status: { type: Number, required: true, default: 0 },
-    deliveryfee: { type: Number, required: true },
-    notes: { type: String },
+    deliveryfee: { type: Number },
     products: [
       {
         productId: {
           type: mongoose.Schema.Types.ObjectId,
           ref: "Product",
         },
-        // productId: {
-        //   type: String,
-        // },
         quantity: {
           type: Number,
           default: 1,
         },
       },
     ],
+    deliveriesoccur: { type: Number, required: true, default: 0 },
     date: { type: Date },
-    howoftenshoulddeliveriesoccur: { type: Number, required: true, default: 0 },
+    notes: { type: String },
+    called: { type: Boolean },
+    status: { type: Number, required: true, default: 0 },
   },
   { timestamps: true }
 );

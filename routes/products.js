@@ -1,5 +1,4 @@
 const Product = require("../models/Products");
-//const Sharedrecords = require("../models/Sharedrecords");
 const { verifyTokenAndAdmin } = require("./verifyToken");
 const {
   validateMongoId,
@@ -7,31 +6,6 @@ const {
 } = require("../middlewares/validators");
 
 const router = require("express").Router();
-
-// async function changeProductCount(indicator) {
-//   try {
-//     let currentProductCount = await Sharedrecords.findById(
-//       "636103a47fdf2224276ae65d"
-//     );
-//     let newOne =
-//       indicator === "increase"
-//         ? currentProductCount.count + 1
-//         : currentProductCount.count - 1;
-
-//     let updatedProductCount = await Sharedrecords.findByIdAndUpdate(
-//       "636103a47fdf2224276ae65d",
-//       {
-//         $set: { productcount: newOne },
-//       },
-//       { new: true }
-//     );
-
-//     console.log(`changed product counter for ${updatedProductCount}`);
-//   } catch (err) {
-//     console.log(`err`, err);
-//     res.status(500).json(err);
-//   }
-// }
 
 router.put(
   "/updatecount",
@@ -65,18 +39,34 @@ router.post(
   verifyTokenAndAdmin,
   validateMongoCategoryId,
   async (req, res) => {
-    const { name, categoryId, unitesperbox, prioritynumber, price } = req.body;
-    if (!name || !categoryId || !unitesperbox || !prioritynumber || !price) {
+    const { name, categoryId, unitesperbox, prioritynumber, price, code } =
+      req.body;
+    if (
+      !name ||
+      !categoryId ||
+      !unitesperbox ||
+      !prioritynumber ||
+      !price ||
+      !code
+    ) {
       return res.status(400).json("Please fill in all the fields");
     } else {
       const newProduct = new Product(req.body);
+
+      const isNewProductCode = await User.isThisCodeInUse(email);
+      if (!isNewProductCode)
+        return res.status(400).json({
+          success: false,
+          message:
+            "This product code is already in use, please enter a different one",
+        });
 
       try {
         const productName = await Product.findOne({ name: req.body.name });
         if (productName) {
           return res
             .status(401)
-            .json("a product with this name has been created");
+            .json("a product with this name has already been created");
         } else {
           const savedProduct = await newProduct.save();
           if (savedProduct) {

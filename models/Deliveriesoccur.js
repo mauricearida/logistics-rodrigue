@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 const DeliveriesOccur = new mongoose.Schema(
   {
     number: { type: Number },
-    name: { type: String, required: true },
+    name: { type: String },
   },
   { timestamps: true }
 );

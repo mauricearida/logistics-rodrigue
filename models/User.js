@@ -23,7 +23,7 @@ UserSchema.statics.isThisEmailInUse = async function (email) {
     if (user) return false;
     return true;
   } catch (error) {
-    console.error(`error inside isThisEmailInUse method`, error.emssage);
+    console.error(`error inside isThisEmailInUse method`, error.message);
     return false;
   }
 };
@@ -35,7 +35,7 @@ UserSchema.statics.isThisUsernameInUse = async function (name) {
     if (user) return false;
     return true;
   } catch (error) {
-    console.error(`error inside isThisUsernameInUse method`, error.emssage);
+    console.error(`error inside isThisUsernameInUse method`, error.message);
     return false;
   }
 };
