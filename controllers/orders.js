@@ -4,8 +4,8 @@ exports.createOrder = async (req, res) => {
   console.log("1");
   //let userPromotion = req.body.Customer;
   //  console.log("userPromotion", userPromotion);
-  const newOrder = new Order(req.body);
   try {
+    const newOrder = new Order(req.body);
     const savedOrder = await newOrder.save();
     res.status(200).json(savedOrder);
   } catch (err) {

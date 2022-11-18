@@ -15,12 +15,8 @@ router.route("/").post(verifyTokenAndAdmin, createRun).get(getAllRuns);
 
 router
   .route("/:id")
-  .put(verifyTokenAndAdmin, validateMongoId, validate, updateRun);
-
-router
-  .route("/:id")
-  .delete(verifyTokenAndAdmin, validateMongoId, validate, deleteRun);
-
-router.route("/:id").get(validateMongoId, getRun);
+  .delete(verifyTokenAndAdmin, validateMongoId, validate, deleteRun)
+  .put(verifyTokenAndAdmin, validateMongoId, validate, updateRun)
+  .get(validateMongoId, getRun);
 
 module.exports = router;

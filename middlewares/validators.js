@@ -117,7 +117,6 @@ exports.creatingOrder = [
     .isEmpty()
     .withMessage("Customer Id is missing"),
   check("products")
-    .trim()
     .not()
     .isEmpty()
     .withMessage("Please insert at least one product"),
