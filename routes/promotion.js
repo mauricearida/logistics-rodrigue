@@ -33,14 +33,14 @@ router.post(
 //UPDATE
 router.put("/:id", verifyTokenAndAdmin, validateMongoId, async (req, res) => {
   try {
-    const updatedCategory = await Category.findByIdAndUpdate(
+    const updatedPromotion = await Promotion.findByIdAndUpdate(
       req.params.id,
       {
         $set: req.body,
       },
       { new: true }
     );
-    res.status(200).json(updatedCategory);
+    res.status(200).json(updatedPromotion);
   } catch (err) {
     res.status(500).json(err);
   }
@@ -53,8 +53,8 @@ router.delete(
   validateMongoId,
   async (req, res) => {
     try {
-      await Category.findByIdAndDelete(req.params.id);
-      res.status(200).json("Category has been deleted...");
+      await Promotion.findByIdAndDelete(req.params.id);
+      res.status(200).json("Promotion has been deleted...");
     } catch (err) {
       res.status(500).json(err);
     }
@@ -64,19 +64,19 @@ router.delete(
 //GET Category
 router.get("/:id", validateMongoId, async (req, res) => {
   try {
-    const category = await Category.findById(req.params.id);
-    res.status(200).json(category);
+    const promotion = await Promotion.findById(req.params.id);
+    res.status(200).json(promotion);
   } catch (err) {
     res.status(500).json(err);
   }
 });
 
-//GET ALL Categories
+//GET ALL Promotion
 router.get("/", async (req, res) => {
   try {
-    const categories = await Category.find();
-    if (categories) {
-      res.status(200).json(categories);
+    const promotions = await Promotion.find();
+    if (promotions) {
+      res.status(200).json(promotions);
     } else {
       return res.status(200).json("No categories found");
     }
@@ -84,4 +84,5 @@ router.get("/", async (req, res) => {
     res.status(500).json(err);
   }
 });
+
 module.exports = router;

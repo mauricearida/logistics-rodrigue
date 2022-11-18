@@ -1,10 +1,10 @@
 const { verifyTokenAndAdmin, verifyToken } = require("./verifyToken");
 const {
   validateMongoId,
-  validateCreateCostumer,
+  validateCreateCustomer,
   validate,
 } = require("../middlewares/validators");
-const Costumer = require("../models/Costumer");
+const Customer = require("../models/Customer");
 const Sharedrecords = require("../models/Sharedrecords");
 const router = require("express").Router();
 
@@ -40,12 +40,12 @@ const dateStrr = "2023-07-21T08:24:24";
 router.post(
   "/",
   verifyToken,
-  validateCreateCostumer,
+  validateCreateCustomer,
   validate,
   async (req, res) => {
     // let abn = req.body.abn;
     // if (abn) {
-    //   const isThisAbnInUse = await Costumer.isThisAbnInUse(abn);
+    //   const isThisAbnInUse = await Customer.isThisAbnInUse(abn);
     //   if (!isThisAbnInUse)
     //     return res.status(400).json({
     //       success: false,
@@ -60,21 +60,21 @@ router.post(
     // const isTimeSequence =
     // new Date(toDate).getTime() < new Date(fromDate).getTime();
     // console.log(`isTimeSequence`, isTimeSequence);
-    const newCostumer = new Costumer(req.body);
+    const newCustomer = new Customer(req.body);
     const codeSequence = await Sharedrecords.findById(
       "63663fa59b531a420083d78f"
     );
-    let codeid = codeSequence.costumercodeid;
+    let codeid = codeSequence.customercodeid;
     console.log("codeid", codeid);
-    newCostumer.codeid = codeid;
+    newCustomer.codeid = codeid;
     try {
-      const savedCostumer = await newCostumer.save();
-      res.status(200).json(savedCostumer);
+      const savedCustomer = await newCustomer.save();
+      res.status(200).json(savedCustomer);
 
       const updatedOcdeSequence = await Sharedrecords.findByIdAndUpdate(
         "63663fa59b531a420083d78f",
         {
-          $inc: { costumercodeid: 1 },
+          $inc: { customercodeid: 1 },
         },
         { new: true }
       );
@@ -89,14 +89,14 @@ router.post(
 //UPDATE
 router.put("/:id", verifyTokenAndAdmin, validateMongoId, async (req, res) => {
   try {
-    const updatedCostumer = await Costumer.findByIdAndUpdate(
+    const updatedCustomer = await Customer.findByIdAndUpdate(
       req.params.id,
       {
         $set: req.body,
       },
       { new: true }
     );
-    res.status(200).json(updatedCostumer);
+    res.status(200).json(updatedCustomer);
   } catch (err) {
     res.status(500).json(err);
   }
@@ -109,25 +109,25 @@ router.delete(
   validateMongoId,
   async (req, res) => {
     try {
-      await Costumer.findByIdAndDelete(req.params.id);
-      res.status(200).json("Costumer has been deleted...");
+      await Customer.findByIdAndDelete(req.params.id);
+      res.status(200).json("Customer has been deleted...");
     } catch (err) {
       res.status(500).json(err);
     }
   }
 );
 
-//GET Costumer
+//GET Customer
 router.get("/:id", validateMongoId, async (req, res) => {
   try {
-    const costumer = await Costumer.findById(req.params.id);
-    res.status(200).json(costumer);
+    const customer = await Customer.findById(req.params.id);
+    res.status(200).json(customer);
   } catch (err) {
     res.status(500).json(err);
   }
 });
 
-// api/costumers?page=1&limit=9&isarchived=false
+// api/customer?page=1&limit=9&isarchived=false
 router.get("/", verifyTokenAndAdmin, async (req, res) => {
   try {
     const { page, limit, isarchived } = req.query;
@@ -137,11 +137,11 @@ router.get("/", verifyTokenAndAdmin, async (req, res) => {
         .json(
           "the required query parameters are : page and limit and isarchived"
         );
-    const costumers = await Costumer.find({ isarchived: isarchived })
+    const customers = await Customer.find({ isarchived: isarchived })
       .limit(limit * 1)
       .skip((page - 1) * limit);
 
-    res.status(200).json(costumers);
+    res.status(200).json(customers);
   } catch (err) {
     res.status(500).json(err);
   }

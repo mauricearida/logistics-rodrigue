@@ -9,6 +9,8 @@ const UserSchema = new mongoose.Schema(
     phonenumber: { type: String, required: true, unique: true },
     lastlogin: { type: Date, default: null },
     role: { type: Number, default: 0 },
+    theme: { type: Number, default: 0 },
+
     // 0 = user
     // 1 = admin
     // 2 = driver (does not user the website)
@@ -32,6 +34,18 @@ UserSchema.statics.isThisUsernameInUse = async function (name) {
   if (!name) throw new Error("Please enter your username");
   try {
     const user = await this.findOne({ name });
+    if (user) return false;
+    return true;
+  } catch (error) {
+    console.error(`error inside isThisUsernameInUse method`, error.message);
+    return false;
+  }
+};
+
+UserSchema.statics.isThisPhoneInUse = async function (phone) {
+  if (!phone) throw new Error("This phone number is already is use");
+  try {
+    const user = await this.findOne({ phonenumber });
     if (user) return false;
     return true;
   } catch (error) {

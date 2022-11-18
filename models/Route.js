@@ -5,11 +5,11 @@ const RouteSchema = new mongoose.Schema(
     name: { type: String },
     description: { type: String },
     places: [{ type: String }],
-    costumers: [
+    customers: [
       {
-        costumer: {
+        customer: {
           type: mongoose.Schema.Types.ObjectId,
-          ref: "Costumer",
+          ref: "Customer",
         },
       },
     ],

@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const CostumerSchema = new mongoose.Schema(
+const CustomerSchema = new mongoose.Schema(
   {
     codeid: { type: Number, required: true },
     businessname: { type: String, required: true },
@@ -12,7 +12,6 @@ const CostumerSchema = new mongoose.Schema(
       {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Order",
-        default: null,
       },
     ],
     ispricingdefault: { type: Boolean, required: true, default: false },
@@ -34,7 +33,7 @@ const CostumerSchema = new mongoose.Schema(
       daystoremind: { type: Number },
       day: { type: String },
       time: { type: Date },
-      //the costumer here has to choose
+      //the customer here has to choose
       //between the 2 lines above or the one line below
       preferredtimes: [
         {
@@ -50,7 +49,7 @@ const CostumerSchema = new mongoose.Schema(
       required: true,
     },
     isconsolidatedbiller: { type: Boolean, required: true },
-    billerforcostumer: {
+    billerforcustomer: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Biller",
     },
@@ -65,4 +64,16 @@ const CostumerSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-module.exports = mongoose.model("Costumer", CostumerSchema);
+module.exports = mongoose.model("Customer", CustomerSchema);
+
+// CustomerSchema.statics.isThisBusinessNameInUse = async function (code) {
+//   if (!code) throw new Error("Please ente a business name for the product");
+//   try {
+//     const product = await this.findOne({ code });
+//     if (product) return false;
+//     return true;
+//   } catch (error) {
+//     console.error(`error inside isThisCodeInUse method`, error.message);
+//     return false;
+//   }
+// };

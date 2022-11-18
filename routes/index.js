@@ -1,11 +1,8 @@
-exports.authRoute = require("./auth");
 exports.usersRoute = require("./user");
 exports.productsRoute = require("./products");
 exports.categoriesRoute = require("./category");
-exports.costumersRoute = require("./costumers");
+exports.customersRoute = require("./customers");
 exports.promotionsRoute = require("./promotion");
-exports.billersRoute = require("./biller");
+
 exports.paymentmethodRoute = require("./paymentmethod");
 exports.deliveryOccurRoute = require("./deliveryoccur");
-exports.routeRoute = require("./route");
-exports.runsRoute = require("./run");

@@ -31,6 +31,7 @@ exports.validateUserSignup = [
     .isEmpty()
     .withMessage("Phone Number is missing"),
 ];
+
 exports.validateUserLogin = [
   check("username")
     .trim()
@@ -46,8 +47,8 @@ exports.validateUserLogin = [
     .withMessage("Password cannot be empty"),
 ];
 
-// Creating Costumer
-exports.validateCreateCostumer = [
+// Creating Customer
+exports.validateCreateCustomer = [
   check("businessname")
     .trim()
     .not()
@@ -93,7 +94,7 @@ exports.validateCreateCostumer = [
   check("state").trim().not().isEmpty().withMessage("State is required"),
 ];
 
-//Creating Promotion
+// Creating Promotion
 exports.validateCreatingPromotion = [
   check("name").trim().not().isEmpty().withMessage("Promotion Name is missing"),
   check("from")
@@ -108,7 +109,7 @@ exports.validateCreatingPromotion = [
     .withMessage("Promotion ending date is missing"),
 ];
 
-//Creating Order
+// Creating Order
 exports.creatingOrder = [
   check("customer")
     .trim()
@@ -132,12 +133,12 @@ exports.creatingOrder = [
     .withMessage("Delivery status is missing"),
 ];
 
-//Creating Biller
+// Creating Biller
 exports.creatingBiller = [
   check("name").trim().not().isEmpty().withMessage("Name is missing"),
 ];
 
-//Creating Routes
+// Creating Routes
 exports.creatingRoute = [
   check("name").trim().not().isEmpty().withMessage("Route Name is missing"),
   check("description")
@@ -152,7 +153,7 @@ exports.creatingRoute = [
     .withMessage("Route places are missing"),
 ];
 
-//Creating RUNS
+// Creating RUNS
 exports.creatingRun = [
   check("route").trim().not().isEmpty().withMessage("Route Id is missing"),
   check("driver").trim().not().isEmpty().withMessage("Driver Id is missing"),
@@ -172,6 +173,7 @@ exports.validateMongoId = (req, res, next) => {
     next();
   }
 };
+
 exports.validateMongoCategoryId = (req, res, next) => {
   const isValid = mongoose.Types.ObjectId.isValid(req.body.categoryId);
   if (!isValid) {

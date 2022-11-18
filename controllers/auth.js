@@ -2,16 +2,7 @@ const jwt = require("jsonwebtoken");
 const CryptoJS = require("crypto-js");
 const User = require("../models/User");
 
-const {
-  validateUserSignup,
-  validateUserLogin,
-  validate,
-} = require("../middlewares/validators");
-
-const router = require("express").Router();
-
-//REGISTER
-router.post("/register", validateUserSignup, validate, async (req, res) => {
+exports.signup = async (req, res) => {
   const { name, email, phonenumber, username, lastlogin, role } = req.body;
 
   //check if email is duplicate
@@ -29,6 +20,16 @@ router.post("/register", validateUserSignup, validate, async (req, res) => {
       success: false,
       message:
         "This name is already in use, please sign in with a different username",
+    });
+
+  //check if phone number is duplicate
+  const isNewPhoneNumber = await User.isThisPhoneInUse(phonenumber);
+
+  if (!isNewPhoneNumber)
+    return res.status(400).json({
+      success: false,
+      message:
+        "This phone number is already in use, please sign in with a different phonenumber",
     });
 
   const newUser = new User({
@@ -54,19 +55,14 @@ router.post("/register", validateUserSignup, validate, async (req, res) => {
       process.env.JWT_SEC,
       { expiresIn: "3d" }
     );
-
-    // savedUser = savedUser.toObject(); // swap for a plain javascript object instance
-    // delete savedUser["lastlogin"];
-    // res.status(200).json({ ...savedUser, accessToken });
     res.status(200).json({ savedUser, accessToken });
   } catch (err) {
     console.log(err);
     res.status(500).json(err);
   }
-});
+};
 
-//LOGIN
-router.post("/login", validateUserLogin, validate, async (req, res) => {
+exports.login = async (req, res) => {
   try {
     const user = await User.findOne({
       username: req.body.username,
@@ -103,6 +99,4 @@ router.post("/login", validateUserLogin, validate, async (req, res) => {
     console.log(err);
     res.status(500).json(err);
   }
-});
-
-module.exports = router;
+};

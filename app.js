@@ -2,21 +2,23 @@ const cors = require("cors");
 const dotenv = require("dotenv");
 const express = require("express");
 const mongoose = require("mongoose");
+const compression = require("compression");
 
 const app = express();
+const authRoute = require("./routess/auth");
+const runsRoutee = require("./routess/runs");
+const billersRoutee = require("./routess/biller");
+const usersRoutee = require("./routess/users");
+const routeRoutee = require("./routess/routes");
+const ordersRoutee = require("./routess/orders");
 
 // https://monjay.app.qore.com.au/customers/add
 // admin@mjmezza.com.au
 // Holden15
 
 const {
-  runsRoute,
-  authRoute,
-  usersRoute,
-  routeRoute,
-  billersRoute,
   productsRoute,
-  costumersRoute,
+  customersRoute,
   promotionsRoute,
   categoriesRoute,
   deliveryOccurRoute,
@@ -25,12 +27,9 @@ const {
 
 dotenv.config();
 
-const MONGO_URL =
-  "mongodb+srv://maurice:mcOWRMghRSo8ljYf@cluster0.zqnfjtu.mongodb.net/?retryWrites=true&w=majority";
-
 const connectWithRetry = () => {
   mongoose
-    .connect(MONGO_URL)
+    .connect(process.env.MONGO_URL)
     .then(() => console.log("DB Connection Successfull!"))
     .catch((err) => {
       console.log(err);
@@ -42,16 +41,20 @@ connectWithRetry();
 
 app.use(cors());
 app.use(express.json());
+app.use(compression());
 
-app.use("/api/auth", authRoute); //
-app.use("/api/runs", runsRoute);
-app.use("/api/users", usersRoute); //
-app.use("/api/routes", routeRoute);
-app.use("/api/biller", billersRoute);
-app.use("/api/products", productsRoute); //
-app.use("/api/costumers", costumersRoute);
+app.use("/api/auth", authRoute);
+app.use("/api/runs", runsRoutee);
+app.use("/api/biller", billersRoutee);
+app.use("/api/users", usersRoutee);
+app.use("/api/routes", routeRoutee);
+//======================
+app.use("/api/orders", ordersRoutee);
+//======================
+app.use("/api/products", productsRoute);
+app.use("/api/customers", customersRoute);
 app.use("/api/promotion", promotionsRoute);
-app.use("/api/categories", categoriesRoute); //
+app.use("/api/categories", categoriesRoute);
 app.use("/api/paymentmethod", paymentmethodRoute);
 app.use("/api/deliveryoccur", deliveryOccurRoute);
 

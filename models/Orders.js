@@ -4,7 +4,7 @@ const OrderSchema = new mongoose.Schema(
   {
     customer: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Costumer",
+      ref: "Customer",
       required: true,
     },
     deliveryfee: { type: Number },

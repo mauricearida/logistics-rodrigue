@@ -8,7 +8,6 @@ const RunSchema = new mongoose.Schema(
     },
     note: { type: String },
     driver: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
-    // date: { type: Date, required: true },
     orders: [
       {
         type: mongoose.Schema.Types.ObjectId,
