@@ -133,7 +133,7 @@ exports.creatingOrder = [
 ];
 
 // Creating Biller
-exports.creatingBiller = [
+exports.validateName = [
   check("name").trim().not().isEmpty().withMessage("Name is missing"),
 ];
 

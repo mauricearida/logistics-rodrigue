@@ -5,7 +5,7 @@ const verifyToken = (req, res, next) => {
   if (authHeader) {
     const token = authHeader.split(" ")[1];
     jwt.verify(token, process.env.JWT_SEC, (err, user) => {
-      //i pesonally added the return in the line below
+      //i personally added the return in the line below
       if (err)
         return res.status(401).json("Your session is over, please login again");
       req.user = user;

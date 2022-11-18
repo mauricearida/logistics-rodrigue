@@ -1,84 +1,27 @@
-const { verifyTokenAndAdmin } = require("./verifyToken");
-const { validateMongoId } = require("../middlewares/validators");
-const Category = require("../models/Category");
 const router = require("express").Router();
-
-// 6364e4756a334d5fb98a79aa
-//CREATE
-router.post("/", verifyTokenAndAdmin, async (req, res) => {
-  const newCategory = new Category(req.body);
-  if (req.body.name) {
-    try {
-      const categoryName = await Category.findOne({ name: req.body.name });
-      if (categoryName) {
-        return res
-          .status(401)
-          .json("A category with this name has been created");
-      } else {
-        const savedCategory = await newCategory.save();
-        res.status(200).json(savedCategory);
-      }
-    } catch (err) {
-      res.status(500).json(err);
-    }
-  } else {
-    return res.status(400).json("A category name is required");
-  }
-});
-
-//UPDATE
-router.put("/:id", verifyTokenAndAdmin, validateMongoId, async (req, res) => {
-  try {
-    const updatedCategory = await Category.findByIdAndUpdate(
-      req.params.id,
-      {
-        $set: req.body,
-      },
-      { new: true }
-    );
-    res.status(200).json(updatedCategory);
-  } catch (err) {
-    res.status(500).json(err);
-  }
-});
-
-//DELETE
-router.delete(
-  "/:id",
-  verifyTokenAndAdmin,
+const {
+  createCategory,
+  updateCategory,
+  deleteCategory,
+  getCategory,
+  getAllCategories,
+} = require("../controllers/category");
+const {
+  validateName,
   validateMongoId,
-  async (req, res) => {
-    try {
-      await Category.findByIdAndDelete(req.params.id);
-      res.status(200).json("Category has been deleted...");
-    } catch (err) {
-      res.status(500).json(err);
-    }
-  }
-);
+  validate,
+} = require("../middlewares/validators");
+const { verifyTokenAndAdmin } = require("../middlewares/verifyToken");
 
-//GET Category
-router.get("/:id", validateMongoId, async (req, res) => {
-  try {
-    const category = await Category.findById(req.params.id);
-    res.status(200).json(category);
-  } catch (err) {
-    res.status(500).json(err);
-  }
-});
+router
+  .route("/")
+  .post(verifyTokenAndAdmin, validateName, validate, createCategory)
+  .get(verifyTokenAndAdmin, getAllCategories);
 
-//GET ALL Categories
-router.get("/", async (req, res) => {
-  try {
-    const categories = await Category.find();
-    if (categories) {
-      res.status(200).json(categories);
-    } else {
-      return res.status(200).json("No categories found");
-    }
-  } catch (err) {
-    res.status(500).json(err);
-  }
-});
+router
+  .route("/:id")
+  .put(verifyTokenAndAdmin, validateMongoId, validate, updateCategory)
+  .delete(verifyTokenAndAdmin, validateMongoId, validate, deleteCategory)
+  .get(validateMongoId, validate, getCategory);
 
 module.exports = router;
