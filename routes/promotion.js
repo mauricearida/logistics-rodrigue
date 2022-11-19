@@ -10,18 +10,13 @@ const {
 const {
   validateMongoId,
   validate,
-  validateCreatingPromotion,
+  creatingPromotion,
 } = require("../middlewares/validators");
 const { verifyTokenAndAdmin } = require("../middlewares/verifyToken");
 
 router
   .route("/")
-  .post(
-    verifyTokenAndAdmin,
-    validateCreatingPromotion,
-    validate,
-    createpromotion
-  )
+  .post(verifyTokenAndAdmin, creatingPromotion, validate, createpromotion)
   .get(verifyTokenAndAdmin, getAllPromotions);
 
 router
@@ -31,4 +26,3 @@ router
   .get(verifyTokenAndAdmin, validateMongoId, getPromotion);
 
 module.exports = router;
-//=====================================

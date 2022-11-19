@@ -2,7 +2,7 @@ const { check, validationResult } = require("express-validator");
 const mongoose = require("mongoose");
 
 // AUTH
-exports.validateUserSignup = [
+exports.validateSignup = [
   check("name")
     .trim()
     .not()
@@ -32,7 +32,7 @@ exports.validateUserSignup = [
     .withMessage("Phone Number is missing"),
 ];
 
-exports.validateUserLogin = [
+exports.validateLogin = [
   check("username")
     .trim()
     .not()
@@ -95,7 +95,7 @@ exports.validateCreateCustomer = [
 ];
 
 // Creating Promotion
-exports.validateCreatingPromotion = [
+exports.creatingPromotion = [
   check("name").trim().not().isEmpty().withMessage("Promotion Name is missing"),
   check("from")
     .trim()
@@ -173,7 +173,7 @@ exports.validateMongoId = (req, res, next) => {
   }
 };
 
-exports.validateMongoCategoryId = (req, res, next) => {
+exports.validateCategoryId = (req, res, next) => {
   const isValid = mongoose.Types.ObjectId.isValid(req.body.categoryId);
   if (!isValid) {
     return res.status(400).json("Please enter a valid ID");

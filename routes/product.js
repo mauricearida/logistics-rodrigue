@@ -10,18 +10,16 @@ const {
 } = require("../controllers/products");
 const {
   validateMongoId,
-  validateMongoCategoryId,
+  validateCategoryId,
   validate,
 } = require("../middlewares/validators");
 const { verifyTokenAndAdmin } = require("../middlewares/verifyToken");
-
-//=====================================
 
 router.route("/updatecount").put(verifyTokenAndAdmin, updateCount);
 
 router
   .route("/")
-  .post(verifyTokenAndAdmin, validateMongoCategoryId, validate, createproduct)
+  .post(verifyTokenAndAdmin, validateCategoryId, validate, createproduct)
   .get(getproductsPaginated);
 
 router
