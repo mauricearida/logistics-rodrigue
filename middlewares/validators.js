@@ -33,13 +33,7 @@ exports.validateSignup = [
 ];
 
 exports.validateLogin = [
-  check("username")
-    .trim()
-    .not()
-    .isEmpty()
-    .withMessage("Username is missing")
-    .isLength({ min: 3, max: 20 })
-    .withMessage("Invalid username, username must be 3 to 20 characaters long"),
+  check("username").trim().not().isEmpty().withMessage("Username is missing"),
   check("password")
     .trim()
     .not()
