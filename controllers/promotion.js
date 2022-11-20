@@ -20,7 +20,11 @@ exports.updatePromotion = async (req, res) => {
       },
       { new: true }
     );
-    res.status(200).json(updatedPromotion);
+    if (updatedPromotion) {
+      res.status(200).json(updatedPromotion);
+    } else {
+      res.status(404).json("No promotion was found with this id !");
+    }
   } catch (err) {
     res.status(500).json(err);
   }
@@ -38,7 +42,11 @@ exports.deletePromotion = async (req, res) => {
 exports.getPromotion = async (req, res) => {
   try {
     const promotion = await Promotion.findById(req.params.id);
-    res.status(200).json(promotion);
+    if (promotion) {
+      res.status(200).json(promotion);
+    } else {
+      res.status(404).json("No promotion was found with this id !");
+    }
   } catch (err) {
     res.status(500).json(err);
   }

@@ -1,9 +1,6 @@
 const Order = require("../models/Orders");
 
 exports.createOrder = async (req, res) => {
-  console.log("1");
-  //let userPromotion = req.body.Customer;
-  //  console.log("userPromotion", userPromotion);
   try {
     const newOrder = new Order(req.body);
     const savedOrder = await newOrder.save();
@@ -23,7 +20,11 @@ exports.updateOrder = async (req, res) => {
       },
       { new: true }
     );
-    res.status(200).json(updatedOrder);
+    if (updatedOrder) {
+      res.status(200).json(updatedOrder);
+    } else {
+      res.status(404).json("No order was found with this id !");
+    }
   } catch (err) {
     res.status(500).json(err);
   }
@@ -41,7 +42,11 @@ exports.deleteOrder = async (req, res) => {
 exports.getOrder = async (req, res) => {
   try {
     const order = await Order.findById(req.params.id);
-    res.status(200).json(order);
+    if (order) {
+      res.status(200).json(order);
+    } else {
+      res.status(404).json("No order was found with this id !");
+    }
   } catch (err) {
     res.status(500).json(err);
   }

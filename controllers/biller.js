@@ -6,13 +6,13 @@ exports.createBiller = async (req, res) => {
   const newBiller = new Biller(req.body);
   const codeSequence = await Sharedrecords.findById("63663fa59b531a420083d78f");
   let codeid = codeSequence.billercodeid;
-  console.log("billercodeid", codeid);
+
   newBiller.number = codeid;
   try {
     const billerName = await Biller.findOne({ name: req.body.name });
     if (billerName) {
       return res
-        .status(401)
+        .status(403)
         .json("A biller with this name has already been created");
     } else {
       const savedBiller = await newBiller.save();
@@ -39,7 +39,12 @@ exports.updateBiller = async (req, res) => {
       },
       { new: true }
     );
-    res.status(200).json(updatedBiller);
+
+    if (updatedBiller) {
+      res.status(200).json(updatedBiller);
+    } else {
+      res.status(404).json("No biller was found with this id");
+    }
   } catch (err) {
     res.status(500).json(err);
   }
@@ -56,8 +61,12 @@ exports.deleteBiller = async (req, res) => {
 
 exports.getBiller = async (req, res) => {
   try {
-    const product = await Biller.findById(req.params.id);
-    res.status(200).json(product);
+    const biller = await Biller.findById(req.params.id);
+    if (biller) {
+      res.status(200).json(biller);
+    } else {
+      res.status(404).json("No biller was found with this id");
+    }
   } catch (err) {
     res.status(500).json(err);
   }
@@ -66,7 +75,11 @@ exports.getBiller = async (req, res) => {
 exports.getAllBillers = async (req, res) => {
   try {
     const billers = await Biller.find();
-    res.status(200).json(billers);
+    if (billers) {
+      res.status(200).json(billers);
+    } else {
+      res.status(404).json("There are no billers");
+    }
   } catch (err) {
     res.status(500).json(err);
   }

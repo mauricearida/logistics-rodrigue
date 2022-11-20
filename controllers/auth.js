@@ -70,7 +70,7 @@ exports.login = async (req, res) => {
       username: req.body.username,
     });
 
-    if (!user) return res.status(401).json("Wrong Username");
+    if (!user) return res.status(400).json("Wrong username or password");
 
     const hashedPassword = CryptoJS.AES.decrypt(
       user.password,
@@ -81,7 +81,7 @@ exports.login = async (req, res) => {
 
     const inputPassword = req.body.password;
     if (originalPassword != inputPassword)
-      return res.status(401).json("Wrong Password");
+      return res.status(400).json("Wrong username or password");
 
     const accessToken = jwt.sign(
       {

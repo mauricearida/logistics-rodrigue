@@ -20,7 +20,11 @@ exports.updateRoute = async (req, res) => {
       },
       { new: true }
     );
-    res.status(200).json(updatedRoute);
+    if (updatedRoute) {
+      res.status(200).json(updatedRoute);
+    } else {
+      res.status(404).json("No route was found with this id !");
+    }
   } catch (err) {
     res.status(500).json(err);
   }
@@ -38,7 +42,11 @@ exports.deleteRoute = async (req, res) => {
 exports.getRouteRoute = async (req, res) => {
   try {
     const route = await Route.findById(req.params.id);
-    res.status(200).json(route);
+    if (route) {
+      res.status(200).json(route);
+    } else {
+      res.status(404).json("No route was found with this id !");
+    }
   } catch (err) {
     res.status(500).json(err);
   }

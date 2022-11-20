@@ -54,7 +54,11 @@ exports.updateCostumer = async (req, res) => {
       },
       { new: true }
     );
-    res.status(200).json(updatedCustomer);
+    if (updatedCustomer) {
+      res.status(200).json(updatedCustomer);
+    } else {
+      res.status(404).json("no costumer was found with this id");
+    }
   } catch (err) {
     res.status(500).json(err);
   }
@@ -72,7 +76,11 @@ exports.deleteCostumer = async (req, res) => {
 exports.getCostumer = async (req, res) => {
   try {
     const customer = await Customer.findById(req.params.id);
-    res.status(200).json(customer);
+    if (customer) {
+      res.status(200).json(customer);
+    } else {
+      res.status(404).json("no costumer was found with this id");
+    }
   } catch (err) {
     res.status(500).json(err);
   }

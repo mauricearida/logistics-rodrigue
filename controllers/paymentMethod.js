@@ -13,7 +13,7 @@ exports.createPaymentMethod = async (req, res) => {
     });
     if (paymentMethodName) {
       return res
-        .status(401)
+        .status(403)
         .json("A payment method with this name has already been created");
     } else {
       const savedPaymentmethod = await newPaymentmethod.save();
@@ -41,9 +41,9 @@ exports.updatePaymentMethod = async (req, res) => {
       { new: true }
     );
     if (updatedPaymentMethod) {
-      return res.status(200).json(updatedPaymentMethod);
+      res.status(200).json(updatedPaymentMethod);
     } else {
-      return res.status(404).json("Payment Method not found");
+      res.status(404).json("No payment Method found with this id");
     }
   } catch (err) {
     console.log(err);
@@ -63,9 +63,11 @@ exports.deletePaymentMethod = async (req, res) => {
 exports.getPaymentMethod = async (req, res) => {
   try {
     const paymentMethod = await Paymentmethod.findById(req.params.id);
-    if (!paymentMethod)
-      return res.status(404).json("Payment method is not found");
-    res.status(200).json(paymentMethod);
+    if (paymentMethod) {
+      res.status(200).json(paymentMethod);
+    } else {
+      res.status(404).json("No payment method found with this id !");
+    }
   } catch (err) {
     res.status(500).json(err);
   }
@@ -74,7 +76,11 @@ exports.getPaymentMethod = async (req, res) => {
 exports.getAllPaymentMethods = async (req, res) => {
   try {
     const paymentMethods = await Paymentmethod.find();
-    res.status(200).json(paymentMethods);
+    if (paymentMethods) {
+      res.status(200).json(paymentMethods);
+    } else {
+      res.status(404).json("No payment method are created yet !");
+    }
   } catch (err) {
     res.status(500).json(err);
   }

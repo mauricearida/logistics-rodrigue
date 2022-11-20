@@ -7,7 +7,7 @@ exports.createCategory = async (req, res) => {
       const categoryName = await Category.findOne({ name: req.body.name });
       if (categoryName) {
         return res
-          .status(401)
+          .status(403)
           .json("A category with this name has been created");
       } else {
         const savedCategory = await newCategory.save();
@@ -30,7 +30,11 @@ exports.updateCategory = async (req, res) => {
       },
       { new: true }
     );
-    res.status(200).json(updatedCategory);
+    if (updatedCategory) {
+      res.status(200).json(updatedCategory);
+    } else {
+      res.status(404).json("There is no category with this id");
+    }
   } catch (err) {
     res.status(500).json(err);
   }
@@ -48,7 +52,11 @@ exports.deleteCategory = async (req, res) => {
 exports.getCategory = async (req, res) => {
   try {
     const category = await Category.findById(req.params.id);
-    res.status(200).json(category);
+    if (category) {
+      res.status(200).json(category);
+    } else {
+      res.status(404).json("There is no category with this id");
+    }
   } catch (err) {
     res.status(500).json(err);
   }

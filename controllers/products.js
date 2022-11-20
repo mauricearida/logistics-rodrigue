@@ -48,7 +48,7 @@ exports.createproduct = async (req, res) => {
       const productName = await Product.findOne({ name: req.body.name });
       if (productName) {
         return res
-          .status(401)
+          .status(403)
           .json("a product with this name has already been created");
       } else {
         const savedProduct = await newProduct.save();
@@ -72,7 +72,11 @@ exports.updateProduct = async (req, res) => {
       },
       { new: true }
     );
-    res.status(200).json(updatedProduct);
+    if (updatedProduct) {
+      res.status(200).json(updatedProduct);
+    } else {
+      res.status(404).json("No product was found with this id !");
+    }
   } catch (err) {
     res.status(500).json(err);
   }
@@ -90,7 +94,11 @@ exports.deleteProduct = async (req, res) => {
 exports.getProduct = async (req, res) => {
   try {
     const product = await Product.findById(req.params.id);
-    res.status(200).json(product);
+    if (product) {
+      res.status(200).json(product);
+    } else {
+      res.status(404).json("No product was found with this id !");
+    }
   } catch (err) {
     res.status(500).json(err);
   }

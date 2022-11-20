@@ -5,7 +5,7 @@ exports.createDeliveryOccur = async (req, res) => {
   const newDeliveryOccur = new DeliveryOccur(req.body);
   const codeSequence = await Sharedrecords.findById("63663fa59b531a420083d78f");
   let codeid = codeSequence.deliveryoccurcodeid;
-  console.log("deliveryoccurcodeid", codeid);
+
   newDeliveryOccur.number = codeid;
   try {
     const deliveryOccurName = await DeliveryOccur.findOne({
@@ -13,7 +13,7 @@ exports.createDeliveryOccur = async (req, res) => {
     });
     if (deliveryOccurName) {
       return res
-        .status(401)
+        .status(403)
         .json("A delivery occur with this name has already been created");
     } else {
       const savedDeliveryOccur = await newDeliveryOccur.save();
@@ -43,7 +43,9 @@ exports.updateDeliveryOccur = async (req, res) => {
     if (updatedDeliveryOccur) {
       return res.status(200).json(updatedDeliveryOccur);
     } else {
-      return res.status(404).json("Delivery occur method not found");
+      return res
+        .status(404)
+        .json("No delivery occur method was found by this id");
     }
   } catch (err) {
     console.log(err);
@@ -54,6 +56,7 @@ exports.updateDeliveryOccur = async (req, res) => {
 exports.deleteDeliveryOccur = async (req, res) => {
   try {
     await DeliveryOccur.findByIdAndDelete(req.params.id);
+
     res.status(200).json("Delivery occur method has been deleted...");
   } catch (err) {
     res.status(500).json(err);
@@ -63,9 +66,11 @@ exports.deleteDeliveryOccur = async (req, res) => {
 exports.getDeliveryOccur = async (req, res) => {
   try {
     const deliveryOccur = await DeliveryOccur.findById(req.params.id);
-    if (!deliveryOccur)
-      return res.status(404).json("Delivery occur method is not found");
-    res.status(200).json(deliveryOccur);
+    if (deliveryOccur) {
+      res.status(200).json(deliveryOccur);
+    } else {
+      res.status(404).json("No delivery occur method was found by this id");
+    }
   } catch (err) {
     res.status(500).json(err);
   }
@@ -74,7 +79,11 @@ exports.getDeliveryOccur = async (req, res) => {
 exports.getAllDeliveryOccur = async (req, res) => {
   try {
     const deliveryOccur = await DeliveryOccur.find();
-    res.status(200).json(deliveryOccur);
+    if (deliveryOccur) {
+      res.status(200).json(deliveryOccur);
+    } else {
+      res.status(404).json("No delivery occur yet !");
+    }
   } catch (err) {
     res.status(500).json(err);
   }
