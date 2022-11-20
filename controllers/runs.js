@@ -20,7 +20,11 @@ exports.updateRun = async (req, res) => {
       },
       { new: true }
     );
-    res.status(200).json(updatedRun);
+    if (updatedRun) {
+      res.status(200).json(updatedRun);
+    } else {
+      res.status(404).json("No run was found with this id !");
+    }
   } catch (err) {
     res.status(500).json(err);
   }
@@ -38,7 +42,11 @@ exports.deleteRun = async (req, res) => {
 exports.getRun = async (req, res) => {
   try {
     const run = await Run.findById(req.params.id);
-    res.status(200).json(run);
+    if (run) {
+      res.status(200).json(run);
+    } else {
+      res.status(404).json("No run was found with this id !");
+    }
   } catch (err) {
     res.status(500).json(err);
   }
