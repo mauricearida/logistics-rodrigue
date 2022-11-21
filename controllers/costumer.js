@@ -1,5 +1,6 @@
 const Customer = require("../models/Customer");
 const Sharedrecords = require("../models/Sharedrecords");
+const { log } = require("../helpers/Loger");
 
 // {
 //     "codeid": 12,
@@ -40,8 +41,8 @@ exports.createCostumer = async (req, res) => {
     );
     console.log("updatedOcdeSequence", updatedOcdeSequence);
   } catch (err) {
-    console.log(`err`, err);
-    res.status(400).json(err);
+    await log(err);
+    res.status(500).json(err);
   }
 };
 
@@ -60,6 +61,7 @@ exports.updateCostumer = async (req, res) => {
       res.status(404).json("no costumer was found with this id");
     }
   } catch (err) {
+    await log(err);
     res.status(500).json(err);
   }
 };
@@ -69,6 +71,7 @@ exports.deleteCostumer = async (req, res) => {
     await Customer.findByIdAndDelete(req.params.id);
     res.status(200).json("Customer has been deleted...");
   } catch (err) {
+    await log(err);
     res.status(500).json(err);
   }
 };
@@ -82,6 +85,7 @@ exports.getCostumer = async (req, res) => {
       res.status(404).json("no costumer was found with this id");
     }
   } catch (err) {
+    await log(err);
     res.status(500).json(err);
   }
 };
@@ -101,6 +105,7 @@ exports.getCostumerPaginatedArchived = async (req, res) => {
 
     res.status(200).json(customers);
   } catch (err) {
+    await log(err);
     res.status(500).json(err);
   }
 };

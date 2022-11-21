@@ -1,5 +1,6 @@
 const DeliveryOccur = require("../models/Deliveriesoccur");
 const Sharedrecords = require("../models/Sharedrecords");
+const { log } = require("../helpers/Loger");
 
 exports.createDeliveryOccur = async (req, res) => {
   const newDeliveryOccur = new DeliveryOccur(req.body);
@@ -27,6 +28,7 @@ exports.createDeliveryOccur = async (req, res) => {
       );
     }
   } catch (err) {
+    await log(err);
     res.status(500).json(err);
   }
 };
@@ -48,7 +50,7 @@ exports.updateDeliveryOccur = async (req, res) => {
         .json("No delivery occur method was found by this id");
     }
   } catch (err) {
-    console.log(err);
+    await log(err);
     res.status(500).json(err);
   }
 };
@@ -59,6 +61,7 @@ exports.deleteDeliveryOccur = async (req, res) => {
 
     res.status(200).json("Delivery occur method has been deleted...");
   } catch (err) {
+    await log(err);
     res.status(500).json(err);
   }
 };
@@ -72,6 +75,7 @@ exports.getDeliveryOccur = async (req, res) => {
       res.status(404).json("No delivery occur method was found by this id");
     }
   } catch (err) {
+    await log(err);
     res.status(500).json(err);
   }
 };
@@ -85,6 +89,7 @@ exports.getAllDeliveryOccur = async (req, res) => {
       res.status(404).json("No delivery occur yet !");
     }
   } catch (err) {
+    await log(err);
     res.status(500).json(err);
   }
 };

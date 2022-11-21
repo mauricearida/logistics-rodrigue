@@ -1,4 +1,5 @@
 const Promotion = require("../models/Promotion");
+const { log } = require("../helpers/Loger");
 
 exports.createpromotion = async (req, res) => {
   const newPromotion = new Promotion(req.body);
@@ -6,7 +7,7 @@ exports.createpromotion = async (req, res) => {
     const savedPromotion = await newPromotion.save();
     res.status(200).json(savedPromotion);
   } catch (err) {
-    console.log(`err`, err);
+    await log(err);
     res.status(500).json(err);
   }
 };
@@ -26,6 +27,7 @@ exports.updatePromotion = async (req, res) => {
       res.status(404).json("No promotion was found with this id !");
     }
   } catch (err) {
+    await log(err);
     res.status(500).json(err);
   }
 };
@@ -35,6 +37,7 @@ exports.deletePromotion = async (req, res) => {
     await Promotion.findByIdAndDelete(req.params.id);
     res.status(200).json("Promotion has been deleted...");
   } catch (err) {
+    await log(err);
     res.status(500).json(err);
   }
 };
@@ -48,6 +51,7 @@ exports.getPromotion = async (req, res) => {
       res.status(404).json("No promotion was found with this id !");
     }
   } catch (err) {
+    await log(err);
     res.status(500).json(err);
   }
 };
@@ -61,6 +65,7 @@ exports.getAllPromotions = async (req, res) => {
       return res.status(200).json("No categories found");
     }
   } catch (err) {
+    await log(err);
     res.status(500).json(err);
   }
 };

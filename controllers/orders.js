@@ -1,4 +1,5 @@
 const Order = require("../models/Orders");
+const { log } = require("../helpers/Loger");
 
 exports.createOrder = async (req, res) => {
   try {
@@ -6,7 +7,7 @@ exports.createOrder = async (req, res) => {
     const savedOrder = await newOrder.save();
     res.status(200).json(savedOrder);
   } catch (err) {
-    console.log(`err`, err);
+    await log(err);
     res.status(500).json(err);
   }
 };
@@ -26,6 +27,7 @@ exports.updateOrder = async (req, res) => {
       res.status(404).json("No order was found with this id !");
     }
   } catch (err) {
+    await log(err);
     res.status(500).json(err);
   }
 };
@@ -35,6 +37,7 @@ exports.deleteOrder = async (req, res) => {
     await Order.findByIdAndDelete(req.params.id);
     res.status(200).json("Order has been deleted...");
   } catch (err) {
+    await log(err);
     res.status(500).json(err);
   }
 };
@@ -48,6 +51,7 @@ exports.getOrder = async (req, res) => {
       res.status(404).json("No order was found with this id !");
     }
   } catch (err) {
+    await log(err);
     res.status(500).json(err);
   }
 };
@@ -61,6 +65,7 @@ exports.getAllOrders = async (req, res) => {
       return res.status(200).json("No orders found");
     }
   } catch (err) {
+    await log(err);
     res.status(500).json(err);
   }
 };

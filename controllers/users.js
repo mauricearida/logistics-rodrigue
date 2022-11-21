@@ -1,4 +1,5 @@
 const User = require("../models/User");
+const { log } = require("../helpers/Loger");
 
 exports.updateUser = async (req, res) => {
   const { name, username, email, password, phonenumber } = req.body;
@@ -22,6 +23,7 @@ exports.updateUser = async (req, res) => {
     );
     res.status(200).json(updatedUser);
   } catch (err) {
+    await log(err);
     res.status(500).json(err);
   }
 };
@@ -31,6 +33,7 @@ exports.deteleUser = async (req, res) => {
     await User.findByIdAndDelete(req.params.id);
     res.status(200).json("User has been deleted...");
   } catch (err) {
+    await log(err);
     res.status(500).json(err);
   }
 };
@@ -42,7 +45,7 @@ exports.getUser = async (req, res) => {
     const { password, ...others } = user._doc;
     res.status(200).json(others);
   } catch (err) {
-    console.log(err);
+    await log(err);
     res.status(500).json(err);
   }
 };
@@ -60,6 +63,7 @@ exports.getAllUsers = async (req, res) => {
 
     res.status(200).json(users);
   } catch (err) {
+    await log(err);
     res.status(500).json(err);
   }
 };

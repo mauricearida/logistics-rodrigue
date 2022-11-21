@@ -1,6 +1,6 @@
 const Biller = require("../models/Biller");
-
 const Sharedrecords = require("../models/Sharedrecords");
+const { log } = require("../helpers/Loger");
 
 exports.createBiller = async (req, res) => {
   const newBiller = new Biller(req.body);
@@ -26,6 +26,7 @@ exports.createBiller = async (req, res) => {
       );
     }
   } catch (err) {
+    await log(err);
     res.status(500).json(err);
   }
 };
@@ -46,6 +47,7 @@ exports.updateBiller = async (req, res) => {
       res.status(404).json("No biller was found with this id");
     }
   } catch (err) {
+    await log(err);
     res.status(500).json(err);
   }
 };
@@ -55,6 +57,7 @@ exports.deleteBiller = async (req, res) => {
     await Biller.findByIdAndDelete(req.params.id);
     res.status(200).json("Biller has been deleted...");
   } catch (err) {
+    await log(err);
     res.status(500).json(err);
   }
 };
@@ -68,6 +71,7 @@ exports.getBiller = async (req, res) => {
       res.status(404).json("No biller was found with this id");
     }
   } catch (err) {
+    await log(err);
     res.status(500).json(err);
   }
 };
@@ -81,6 +85,7 @@ exports.getAllBillers = async (req, res) => {
       res.status(404).json("There are no billers");
     }
   } catch (err) {
+    await log(err);
     res.status(500).json(err);
   }
 };

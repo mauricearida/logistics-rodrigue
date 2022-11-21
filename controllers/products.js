@@ -1,4 +1,5 @@
 const Product = require("../models/Products");
+const { log } = require("../helpers/Loger");
 
 exports.updateCount = async (req, res) => {
   try {
@@ -16,7 +17,7 @@ exports.updateCount = async (req, res) => {
     console.log(`updatedProductCount`, updatedProductCount);
     res.status(200).json(updatedProductCount);
   } catch (err) {
-    console.log(`err`, err);
+    await log(err);
     res.status(500).json(err);
   }
 };
@@ -58,6 +59,7 @@ exports.createproduct = async (req, res) => {
         res.status(200).json(savedProduct);
       }
     } catch (err) {
+      await log(err);
       res.status(500).json(err);
     }
   }
@@ -78,6 +80,7 @@ exports.updateProduct = async (req, res) => {
       res.status(404).json("No product was found with this id !");
     }
   } catch (err) {
+    await log(err);
     res.status(500).json(err);
   }
 };
@@ -87,6 +90,7 @@ exports.deleteProduct = async (req, res) => {
     await Product.findByIdAndDelete(req.params.id);
     res.status(200).json("Product has been deleted...");
   } catch (err) {
+    await log(err);
     res.status(500).json(err);
   }
 };
@@ -100,6 +104,7 @@ exports.getProduct = async (req, res) => {
       res.status(404).json("No product was found with this id !");
     }
   } catch (err) {
+    await log(err);
     res.status(500).json(err);
   }
 };
@@ -114,6 +119,7 @@ exports.getproductsPaginated = async (req, res) => {
 
     res.status(200).json({ productsCount, products });
   } catch (err) {
+    await log(err);
     res.status(500).json(err);
   }
 };

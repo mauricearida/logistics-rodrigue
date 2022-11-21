@@ -1,4 +1,5 @@
 const Category = require("../models/Category");
+const { log } = require("../helpers/Loger");
 
 exports.createCategory = async (req, res) => {
   const newCategory = new Category(req.body);
@@ -14,6 +15,7 @@ exports.createCategory = async (req, res) => {
         res.status(200).json(savedCategory);
       }
     } catch (err) {
+      await log(err);
       res.status(500).json(err);
     }
   } else {
@@ -36,6 +38,7 @@ exports.updateCategory = async (req, res) => {
       res.status(404).json("There is no category with this id");
     }
   } catch (err) {
+    await log(err);
     res.status(500).json(err);
   }
 };
@@ -45,6 +48,7 @@ exports.deleteCategory = async (req, res) => {
     await Category.findByIdAndDelete(req.params.id);
     res.status(200).json("Category has been deleted...");
   } catch (err) {
+    await log(err);
     res.status(500).json(err);
   }
 };
@@ -58,6 +62,7 @@ exports.getCategory = async (req, res) => {
       res.status(404).json("There is no category with this id");
     }
   } catch (err) {
+    await log(err);
     res.status(500).json(err);
   }
 };
@@ -71,6 +76,7 @@ exports.getAllCategories = async (req, res) => {
       return res.status(200).json("No categories found");
     }
   } catch (err) {
+    await log(err);
     res.status(500).json(err);
   }
 };

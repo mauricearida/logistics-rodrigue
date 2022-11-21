@@ -1,5 +1,6 @@
 const Paymentmethod = require("../models/Paymentmethod");
 const Sharedrecords = require("../models/Sharedrecords");
+const { log } = require("../helpers/Loger");
 
 exports.createPaymentMethod = async (req, res) => {
   const newPaymentmethod = new Paymentmethod(req.body);
@@ -27,6 +28,7 @@ exports.createPaymentMethod = async (req, res) => {
       );
     }
   } catch (err) {
+    await log(err);
     res.status(500).json(err);
   }
 };
@@ -46,7 +48,7 @@ exports.updatePaymentMethod = async (req, res) => {
       res.status(404).json("No payment Method found with this id");
     }
   } catch (err) {
-    console.log(err);
+    await log(err);
     res.status(500).json(err);
   }
 };
@@ -56,6 +58,7 @@ exports.deletePaymentMethod = async (req, res) => {
     await Paymentmethod.findByIdAndDelete(req.params.id);
     res.status(200).json("Payment method has been deleted...");
   } catch (err) {
+    await log(err);
     res.status(500).json(err);
   }
 };
@@ -69,6 +72,7 @@ exports.getPaymentMethod = async (req, res) => {
       res.status(404).json("No payment method found with this id !");
     }
   } catch (err) {
+    await log(err);
     res.status(500).json(err);
   }
 };
@@ -82,6 +86,7 @@ exports.getAllPaymentMethods = async (req, res) => {
       res.status(404).json("No payment method are created yet !");
     }
   } catch (err) {
+    await log(err);
     res.status(500).json(err);
   }
 };

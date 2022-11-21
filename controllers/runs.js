@@ -1,4 +1,5 @@
 const Run = require("../models/Run");
+const { log } = require("../helpers/Loger");
 
 exports.createRun = async (req, res) => {
   const newRun = new Run(req.body);
@@ -6,7 +7,7 @@ exports.createRun = async (req, res) => {
     const savedRun = await newRun.save();
     res.status(200).json(savedRun);
   } catch (err) {
-    console.log(`err`, err);
+    await log(err);
     res.status(500).json(err);
   }
 };
@@ -26,6 +27,7 @@ exports.updateRun = async (req, res) => {
       res.status(404).json("No run was found with this id !");
     }
   } catch (err) {
+    await log(err);
     res.status(500).json(err);
   }
 };
@@ -35,6 +37,7 @@ exports.deleteRun = async (req, res) => {
     await Run.findByIdAndDelete(req.params.id);
     res.status(200).json("Run has been deleted...");
   } catch (err) {
+    await log(err);
     res.status(500).json(err);
   }
 };
@@ -48,6 +51,7 @@ exports.getRun = async (req, res) => {
       res.status(404).json("No run was found with this id !");
     }
   } catch (err) {
+    await log(err);
     res.status(500).json(err);
   }
 };
@@ -61,6 +65,7 @@ exports.getAllRuns = async (req, res) => {
       return res.status(200).json("No runs found");
     }
   } catch (err) {
+    await log(err);
     res.status(500).json(err);
   }
 };

@@ -1,6 +1,7 @@
 const jwt = require("jsonwebtoken");
 const CryptoJS = require("crypto-js");
 const User = require("../models/User");
+const { log } = require("../helpers/Loger");
 
 exports.signup = async (req, res) => {
   const { name, email, phonenumber, username, lastlogin, role } = req.body;
@@ -59,7 +60,7 @@ exports.signup = async (req, res) => {
     );
     res.status(200).json({ savedUser, accessToken });
   } catch (err) {
-    console.log(err);
+    await log(err);
     res.status(500).json(err);
   }
 };
@@ -98,7 +99,7 @@ exports.login = async (req, res) => {
     const { password, ...others } = user._doc;
     return res.status(200).json({ ...others, accessToken });
   } catch (err) {
-    console.log(err);
+    await log(err);
     res.status(500).json(err);
   }
 };
