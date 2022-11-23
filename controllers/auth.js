@@ -95,11 +95,13 @@ exports.login = async (req, res) => {
     // let AuDate = new Date().toLocaleString("en-US", {
     //   timeZone: "Australia/Sydney",
     // });
+
     user.lastlogin = Date.now();
     const { password, ...others } = user._doc;
     return res.status(200).json({ ...others, accessToken });
   } catch (err) {
     await log(err);
+    console.log(`err`, err);
     res.status(500).json(err);
   }
 };
