@@ -1,4 +1,5 @@
 const Category = require("../models/Category");
+const Products = require("../models/Products");
 const { log } = require("../helpers/Loger");
 
 exports.createCategory = async (req, res) => {
@@ -56,7 +57,13 @@ exports.deleteCategory = async (req, res) => {
 exports.getCategory = async (req, res) => {
   try {
     const category = await Category.findById(req.params.id);
+    const productCount = await Products.find({
+      categoryId: req.params.id,
+    }).count();
+    console.log("productCount", productCount);
     if (category) {
+      category.productCount = productCount;
+      console.log("category", category);
       res.status(200).json(category);
     } else {
       res.status(404).json("There is no category with this id");
@@ -71,7 +78,7 @@ exports.getAllCategories = async (req, res) => {
   try {
     const categories = await Category.find().sort({ _id: -1 });
     if (categories) {
-      res.status(200).json(categories);
+      return res.status(200).json(categories);
     } else {
       return res.status(200).json("No categories found");
     }

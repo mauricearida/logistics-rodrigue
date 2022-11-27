@@ -1,4 +1,4 @@
-const Product = require("../models/Products");
+const Products = require("../models/Products");
 const { log } = require("../helpers/Loger");
 
 exports.updateCount = async (req, res) => {
@@ -35,9 +35,9 @@ exports.createproduct = async (req, res) => {
   ) {
     return res.status(400).json("Please fill in all the fields");
   } else {
-    const newProduct = new Product(req.body);
+    const newProduct = new Products(req.body);
 
-    const isNewProductCode = await User.isThisCodeInUse(email);
+    const isNewProductCode = await Products.isThisCodeInUse(code);
     if (!isNewProductCode)
       return res.status(400).json({
         success: false,
@@ -46,19 +46,17 @@ exports.createproduct = async (req, res) => {
       });
 
     try {
-      const productName = await Product.findOne({ name: req.body.name });
+      const productName = await Products.findOne({ name: req.body.name });
       if (productName) {
         return res
           .status(403)
           .json("a product with this name has already been created");
       } else {
         const savedProduct = await newProduct.save();
-        if (savedProduct) {
-          changeProductCount("increase");
-        }
         res.status(200).json(savedProduct);
       }
     } catch (err) {
+      console.log(err);
       await log(err);
       res.status(500).json(err);
     }
@@ -67,7 +65,7 @@ exports.createproduct = async (req, res) => {
 
 exports.updateProduct = async (req, res) => {
   try {
-    const updatedProduct = await Product.findByIdAndUpdate(
+    const updatedProduct = await Products.findByIdAndUpdate(
       req.params.id,
       {
         $set: req.body,
@@ -87,7 +85,7 @@ exports.updateProduct = async (req, res) => {
 
 exports.deleteProduct = async (req, res) => {
   try {
-    await Product.findByIdAndDelete(req.params.id);
+    await Products.findByIdAndDelete(req.params.id);
     res.status(200).json("Product has been deleted...");
   } catch (err) {
     await log(err);
@@ -97,7 +95,7 @@ exports.deleteProduct = async (req, res) => {
 
 exports.getProduct = async (req, res) => {
   try {
-    const product = await Product.findById(req.params.id);
+    const product = await Products.findById(req.params.id);
     if (product) {
       res.status(200).json(product);
     } else {
@@ -111,9 +109,9 @@ exports.getProduct = async (req, res) => {
 
 exports.getproductsPaginated = async (req, res) => {
   try {
-    let productsCount = await Product.count({}).exec();
+    let productsCount = await Products.count({}).exec();
     const { page = 1, limit = 5 } = req.query;
-    const products = await Product.find()
+    const products = await Products.find()
       .sort("name")
       .limit(limit * 1)
       .skip((page - 1) * limit);

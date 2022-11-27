@@ -64,8 +64,6 @@ const CustomerSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-module.exports = mongoose.model("Customer", CustomerSchema);
-
 // CustomerSchema.statics.isThisBusinessNameInUse = async function (code) {
 //   if (!code) throw new Error("Please ente a business name for the product");
 //   try {
@@ -77,3 +75,5 @@ module.exports = mongoose.model("Customer", CustomerSchema);
 //     return false;
 //   }
 // };
+
+module.exports = mongoose.model("Customer", CustomerSchema);

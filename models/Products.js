@@ -17,8 +17,6 @@ const ProductSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-module.exports = mongoose.model("Product", ProductSchema);
-
 ProductSchema.statics.isThisCodeInUse = async function (code) {
   if (!code) throw new Error("Please a code for the product");
   try {
@@ -30,3 +28,5 @@ ProductSchema.statics.isThisCodeInUse = async function (code) {
     return false;
   }
 };
+
+module.exports = mongoose.model("Product", ProductSchema);
