@@ -114,7 +114,7 @@ exports.getproductsPaginated = async (req, res) => {
     let productsCount = await Product.count({}).exec();
     const { page = 1, limit = 5 } = req.query;
     const products = await Product.find()
-      .sort({ _id: -1 })
+      .sort("name")
       .limit(limit * 1)
       .skip((page - 1) * limit);
 
