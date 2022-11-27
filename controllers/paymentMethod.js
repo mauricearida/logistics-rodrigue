@@ -79,7 +79,7 @@ exports.getPaymentMethod = async (req, res) => {
 
 exports.getAllPaymentMethods = async (req, res) => {
   try {
-    const paymentMethods = await Paymentmethod.find();
+    const paymentMethods = await Paymentmethod.find().sort({ _id: -1 });
     if (paymentMethods) {
       res.status(200).json(paymentMethods);
     } else {

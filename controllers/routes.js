@@ -58,7 +58,7 @@ exports.getRouteRoute = async (req, res) => {
 
 exports.getAllRoutes = async (req, res) => {
   try {
-    const routes = await Route.find();
+    const routes = await Route.find().sort({ _id: -1 });
     if (routes) {
       res.status(200).json(routes);
     } else {

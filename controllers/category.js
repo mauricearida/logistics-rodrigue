@@ -69,7 +69,7 @@ exports.getCategory = async (req, res) => {
 
 exports.getAllCategories = async (req, res) => {
   try {
-    const categories = await Category.find();
+    const categories = await Category.find().sort({ _id: -1 });
     if (categories) {
       res.status(200).json(categories);
     } else {

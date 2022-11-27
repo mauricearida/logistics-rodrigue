@@ -82,7 +82,7 @@ exports.getDeliveryOccur = async (req, res) => {
 
 exports.getAllDeliveryOccur = async (req, res) => {
   try {
-    const deliveryOccur = await DeliveryOccur.find();
+    const deliveryOccur = await DeliveryOccur.find().sort({ _id: -1 });
     if (deliveryOccur) {
       res.status(200).json(deliveryOccur);
     } else {

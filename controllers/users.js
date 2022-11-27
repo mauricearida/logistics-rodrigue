@@ -58,6 +58,7 @@ exports.getAllUsers = async (req, res) => {
         .status(400)
         .json("the required query parameters are : page and limit");
     const users = await User.find()
+      .sort({ _id: -1 })
       .limit(limit * 1)
       .skip((page - 1) * limit);
 

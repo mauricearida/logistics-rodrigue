@@ -100,6 +100,7 @@ exports.getCostumerPaginatedArchived = async (req, res) => {
           "the required query parameters are : page and limit and isarchived"
         );
     const customers = await Customer.find({ isarchived: isarchived })
+      .sort({ _id: -1 })
       .limit(limit * 1)
       .skip((page - 1) * limit);
 

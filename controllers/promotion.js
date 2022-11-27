@@ -58,7 +58,7 @@ exports.getPromotion = async (req, res) => {
 
 exports.getAllPromotions = async (req, res) => {
   try {
-    const promotions = await Promotion.find();
+    const promotions = await Promotion.find().sort({ _id: -1 });
     if (promotions) {
       res.status(200).json(promotions);
     } else {

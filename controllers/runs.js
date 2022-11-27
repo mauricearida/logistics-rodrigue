@@ -58,7 +58,7 @@ exports.getRun = async (req, res) => {
 
 exports.getAllRuns = async (req, res) => {
   try {
-    const runs = await Run.find();
+    const runs = await Run.find().sort({ _id: -1 });
     if (runs) {
       res.status(200).json(runs);
     } else {

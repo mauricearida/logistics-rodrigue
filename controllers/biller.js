@@ -78,7 +78,7 @@ exports.getBiller = async (req, res) => {
 
 exports.getAllBillers = async (req, res) => {
   try {
-    const billers = await Biller.find();
+    const billers = await Biller.find().sort({ _id: -1 });
     if (billers) {
       res.status(200).json(billers);
     } else {
