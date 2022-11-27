@@ -6,14 +6,17 @@ const {
   deteleUser,
 } = require("../controllers/users");
 const { validateMongoId, validate } = require("../middlewares/validators");
-const { verifyTokenAndAdmin } = require("../middlewares/verifyToken");
+const {
+  verifyTokenAndAdmin,
+  verifyTokenAndAuthorization,
+} = require("../middlewares/verifyToken");
 
 //=============================
 
 router
   .route("/:id")
   .get(verifyTokenAndAdmin, getUser)
-  .put(verifyTokenAndAdmin, validateMongoId, validate, updateUser)
+  .put(verifyTokenAndAuthorization, validateMongoId, validate, updateUser)
   .delete(verifyTokenAndAdmin, validateMongoId, validate, deteleUser);
 
 router.route("/").get(verifyTokenAndAdmin, getAllUsers);

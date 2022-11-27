@@ -83,7 +83,7 @@ exports.getAllPaymentMethods = async (req, res) => {
     if (paymentMethods) {
       res.status(200).json(paymentMethods);
     } else {
-      res.status(404).json("No payment method are created yet !");
+      res.status(404).json("No payment methods are created yet !");
     }
   } catch (err) {
     await log(err);
