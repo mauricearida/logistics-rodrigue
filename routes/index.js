@@ -10,3 +10,4 @@ exports.paymentMethodRoute = require("./paymentMethods");
 exports.productRoute = require("./product");
 exports.categoryRoute = require("./category");
 exports.costumerRoute = require("./costumer");
+exports.vehiclesRoute = require("./vehicle");
