@@ -45,6 +45,9 @@ app.use(express.json());
 app.use(compression());
 
 app.use("/api/auth", authRoute);
+
+app.use("/api/users", authRoute);
+app.use("/api/drivers", authRoute);
 app.use("/api/runs", runsRoute);
 app.use("/api/biller", billersRoute);
 app.use("/api/users", usersRoute);

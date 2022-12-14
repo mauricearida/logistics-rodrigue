@@ -59,11 +59,11 @@ exports.validateCreateCustomer = [
     .not()
     .isEmpty()
     .withMessage("Is pricing default is required"),
-  check("firstname")
+  check("customername")
     .trim()
     .not()
     .isEmpty()
-    .withMessage("Firstnamee is required"),
+    .withMessage("customer name is required"),
   check("phonenumber")
     .trim()
     .not()

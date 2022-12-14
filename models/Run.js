@@ -8,6 +8,7 @@ const RunSchema = new mongoose.Schema(
     },
     note: { type: String },
     driver: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+    vehicle: { type: mongoose.Schema.Types.ObjectId, ref: "Vehicle" },
     orders: [
       {
         type: mongoose.Schema.Types.ObjectId,

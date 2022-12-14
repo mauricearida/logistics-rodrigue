@@ -8,8 +8,8 @@ const VehicleSchema = new mongoose.Schema(
     color: { type: String },
     expiresIn: { type: Date },
     lastUsed: { type: Date },
+    manufactureyear: { type: Number },
     status: { type: Number, default: 0 },
-    driver: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
   },
   { timestamps: true }
 );

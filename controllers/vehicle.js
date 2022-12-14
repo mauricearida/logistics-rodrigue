@@ -5,7 +5,6 @@ exports.createVehicle = async (req, res) => {
   try {
     const { plate } = req.body;
     const newVehicle = new Vehicle(req.body);
-
     const isNewPlateVehicle = await Vehicle.isThisPlateInUse(plate);
     if (!isNewPlateVehicle)
       return res.status(400).json({

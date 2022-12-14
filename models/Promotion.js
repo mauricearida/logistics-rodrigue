@@ -6,13 +6,14 @@ const PromotionSchema = new mongoose.Schema(
     description: { type: String },
     from: { type: Date },
     to: { type: Date },
-    listprice: [
+    products: [
       {
-        product: {
+        productId: {
           type: mongoose.Schema.Types.ObjectId,
           ref: "Product",
         },
         newprice: { type: Number },
+        discount: { type: Number },
       },
     ],
   },

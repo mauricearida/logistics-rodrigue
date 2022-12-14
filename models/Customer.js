@@ -15,7 +15,7 @@ const CustomerSchema = new mongoose.Schema(
       },
     ],
     ispricingdefault: { type: Boolean, required: true, default: false },
-    firstname: { type: String, required: true },
+    customername: { type: String, required: true },
     lastname: { type: String },
     email: { type: String },
     phonenumber: { type: String, required: true },
@@ -64,16 +64,17 @@ const CustomerSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// CustomerSchema.statics.isThisBusinessNameInUse = async function (code) {
-//   if (!code) throw new Error("Please ente a business name for the product");
-//   try {
-//     const product = await this.findOne({ code });
-//     if (product) return false;
-//     return true;
-//   } catch (error) {
-//     console.error(`error inside isThisCodeInUse method`, error.message);
-//     return false;
-//   }
-// };
+CustomerSchema.statics.isThisBusinessNameInUse = async function (businessname) {
+  if (!businessname)
+    throw new Error("Please ente a business name for the product");
+  try {
+    const product = await this.findOne({ businessname });
+    if (product) return false;
+    return true;
+  } catch (error) {
+    console.error(`error inside isThisCodeInUse method`, error.message);
+    return false;
+  }
+};
 
 module.exports = mongoose.model("Customer", CustomerSchema);

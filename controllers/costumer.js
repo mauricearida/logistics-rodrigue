@@ -28,10 +28,20 @@ exports.createCostumer = async (req, res) => {
   let codeid = codeSequence.customercodeid;
   console.log("codeid", codeid);
   newCustomer.codeid = codeid;
+
+  const isNewBusinessName = await Customer.isThisBusinessNameInUse(
+    req.body.businessname
+  );
+  if (!isNewBusinessName)
+    return res.status(400).json({
+      success: false,
+      message:
+        "This business name is already in use, try register with a different one",
+    });
   try {
     const savedCustomer = await newCustomer.save();
     res.status(200).json(savedCustomer);
-
+    console.log("1111");
     const updatedOcdeSequence = await Sharedrecords.findByIdAndUpdate(
       "63663fa59b531a420083d78f",
       {
@@ -78,7 +88,9 @@ exports.deleteCostumer = async (req, res) => {
 
 exports.getCostumer = async (req, res) => {
   try {
-    const customer = await Customer.findById(req.params.id);
+    const customer = await Customer.findById(req.params.id).populate(
+      "paymentmethod"
+    );
     if (customer) {
       res.status(200).json(customer);
     } else {
@@ -100,6 +112,7 @@ exports.getCostumerPaginatedArchived = async (req, res) => {
           "the required query parameters are : page and limit and isarchived"
         );
     const customers = await Customer.find({ isarchived: isarchived })
+      .populate("paymentmethod")
       .sort({ _id: -1 })
       .limit(limit * 1)
       .skip((page - 1) * limit);
