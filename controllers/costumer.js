@@ -51,6 +51,7 @@ exports.createCostumer = async (req, res) => {
     );
     console.log("updatedOcdeSequence", updatedOcdeSequence);
   } catch (err) {
+    console.log("err", err);
     await log(err);
     res.status(500).json(err);
   }

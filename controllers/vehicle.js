@@ -22,14 +22,6 @@ exports.createVehicle = async (req, res) => {
 
 exports.updateVehicle = async (req, res) => {
   try {
-    const { plate } = req.body;
-    const isNewPlateVehicle = await Vehicle.isThisPlateInUse(plate);
-    if (!isNewPlateVehicle)
-      return res.status(400).json({
-        success: false,
-        message:
-          "This plate is already in use, try register with a different one",
-      });
     const updatedVehicle = await Vehicle.findByIdAndUpdate(
       req.params.id,
       {

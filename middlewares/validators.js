@@ -59,6 +59,7 @@ exports.validateCreateCustomer = [
     .not()
     .isEmpty()
     .withMessage("Is pricing default is required"),
+  check("email").isEmail().withMessage("Email is Invalid"),
   check("customername")
     .trim()
     .not()

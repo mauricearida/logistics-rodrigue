@@ -8,16 +8,16 @@ const CustomerSchema = new mongoose.Schema(
     isarchived: { type: Boolean, default: false },
     suburb: { type: String, required: true },
     notes: { type: String },
-    pendingorders: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Order",
-      },
-    ],
-    ispricingdefault: { type: Boolean, required: true, default: false },
+    // pendingorders: [
+    //   {
+    //     type: mongoose.Schema.Types.ObjectId,
+    //     ref: "Order",
+    //   },
+    // ],
+    ispricingdefault: { type: Boolean, required: true, default: true },
     customername: { type: String, required: true },
-    lastname: { type: String },
     email: { type: String },
+    abn: { type: String },
     phonenumber: { type: String, required: true },
     mobilenumber: { type: String },
     directdialnumber: { type: String },
@@ -29,20 +29,14 @@ const CustomerSchema = new mongoose.Schema(
       ref: "Deliveriesoccur",
       required: true,
     },
-    delivery: {
-      daystoremind: { type: Number },
-      day: { type: String },
-      time: { type: Date },
-      //the customer here has to choose
-      //between the 2 lines above or the one line below
-      preferredtimes: [
-        {
-          day: { type: String },
-          starttime: { type: Date },
-          endtime: { type: Date },
-        },
-      ],
-    },
+    preferredtimes: [
+      {
+        day: { type: String },
+        daystoremind: { type: Number },
+        from: { type: Date },
+        to: { type: Date },
+      },
+    ],
     paymentmethod: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Paymentmethod",
@@ -59,7 +53,6 @@ const CustomerSchema = new mongoose.Schema(
         ref: "Promotion",
       },
     ],
-    ispricingdefault: { type: Boolean, required: true },
   },
   { timestamps: true }
 );
