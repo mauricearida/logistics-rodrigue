@@ -68,13 +68,3 @@ exports.getAllUsers = async (req, res) => {
     res.status(500).json(err);
   }
 };
-
-exports.getAllAdmins = async (req, res) => {
-  try {
-    const users = await User.find({ role: 0 });
-    res.status(200).json(users);
-  } catch (err) {
-    await log(err);
-    res.status(500).json(err);
-  }
-};

@@ -4,7 +4,6 @@ const {
   updateUser,
   getAllUsers,
   deteleUser,
-  getAllAdmins,
 } = require("../controllers/users");
 const { validateMongoId, validate } = require("../middlewares/validators");
 const {
@@ -21,6 +20,5 @@ router
   .delete(verifyTokenAndAdmin, validateMongoId, validate, deteleUser);
 
 router.route("/").get(verifyTokenAndAdmin, getAllUsers);
-//router.route("/admins").get(verifyTokenAndAdmin, getAllAdmins);
 
 module.exports = router;

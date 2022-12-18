@@ -20,6 +20,7 @@ const {
   categoryRoute,
   costumerRoute,
   vehiclesRoute,
+  peopleRoute,
 } = require("./routes");
 
 // https://monjay.app.qore.com.au/customers/add
@@ -60,6 +61,7 @@ app.use("/api/categories", categoryRoute);
 app.use("/api/paymentmethod", paymentMethodRoute);
 app.use("/api/deliveryoccur", deliveryOccurRoute);
 app.use("/api/vehicles", vehiclesRoute);
+app.use("/api/people", peopleRoute);
 
 app.listen(process.env.PORT || 5000, () => {
   console.log("Backend server is running!");
