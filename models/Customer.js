@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 
 const CustomerSchema = new mongoose.Schema(
   {
-    codeid: { type: Number, required: true },
+    codeid: { type: String, required: true },
     businessname: { type: String, required: true },
     address: { type: [String], required: true },
     isarchived: { type: Boolean, default: false },
@@ -63,6 +63,18 @@ CustomerSchema.statics.isThisBusinessNameInUse = async function (businessname) {
   try {
     const product = await this.findOne({ businessname });
     if (product) return false;
+    return true;
+  } catch (error) {
+    console.error(`error inside isThisCodeInUse method`, error.message);
+    return false;
+  }
+};
+
+CustomerSchema.statics.isThisEmailInUse = async function (email) {
+  if (!email) throw new Error("Please ente an email for this customer");
+  try {
+    const customer = await this.findOne({ email });
+    if (customer) return false;
     return true;
   } catch (error) {
     console.error(`error inside isThisCodeInUse method`, error.message);

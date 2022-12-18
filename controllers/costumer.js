@@ -2,31 +2,15 @@ const Customer = require("../models/Customer");
 const Sharedrecords = require("../models/Sharedrecords");
 const { log } = require("../helpers/Loger");
 
-// {
-//     "codeid": 12,
-//     "businessname": "busine3ss name",
-//     "to": 1233,
-//     "abn":123,
-//     "from": 1233,
-//     "address": [
-//         "This is an array"
-//     ],
-//     "suburb": "suburb 132",
-//     "ispricingdefault": true,
-//     "firstname": "first name",
-//     "phonenumber": "123456679",
-//     "deliveryoccur": "6364e4756a334d5fb98a79aa",
-//     "paymentmethod": "6364e4756a334d5fb98a79aa",
-//     "isconsolidatedbiller": true,
-//     "postcode": 123,
-//     "state": true
-// }
-
 exports.createCostumer = async (req, res) => {
   const newCustomer = new Customer(req.body);
   const codeSequence = await Sharedrecords.findById("63663fa59b531a420083d78f");
   let codeid = codeSequence.customercodeid;
-  console.log("codeid", codeid);
+  codeid = codeid.toString();
+
+  while (codeid.length < 4) {
+    codeid = "0" + codeid;
+  }
   newCustomer.codeid = codeid;
 
   const isNewBusinessName = await Customer.isThisBusinessNameInUse(
@@ -37,6 +21,14 @@ exports.createCostumer = async (req, res) => {
       success: false,
       message:
         "This business name is already in use, try register with a different one",
+    });
+
+  const isNewEmail = await Customer.isThisEmailInUse(req.body.email);
+  if (!isNewEmail)
+    return res.status(400).json({
+      success: false,
+      message:
+        "This email is already in use, try register with a different one",
     });
   try {
     const savedCustomer = await newCustomer.save();
@@ -80,7 +72,12 @@ exports.updateCostumer = async (req, res) => {
 exports.deleteCostumer = async (req, res) => {
   try {
     await Customer.findByIdAndDelete(req.params.id);
-    res.status(200).json("Customer has been deleted...");
+    const customerCount = await Customer.find().count();
+    let objectTosend = {
+      customerCount,
+      message: "Customer has been deleted...",
+    };
+    res.status(200).json(objectTosend);
   } catch (err) {
     await log(err);
     res.status(500).json(err);
@@ -105,6 +102,7 @@ exports.getCostumer = async (req, res) => {
 
 exports.getCostumerPaginatedArchived = async (req, res) => {
   try {
+    const customerCount = await Customer.find().count();
     const { page, limit, isarchived } = req.query;
     if (!page || !limit || !isarchived)
       return res
@@ -112,14 +110,15 @@ exports.getCostumerPaginatedArchived = async (req, res) => {
         .json(
           "the required query parameters are : page and limit and isarchived"
         );
-    const customers = await Customer.find({ isarchived: isarchived })
+    let customers = await Customer.find({ isarchived: isarchived })
       .populate("paymentmethod")
       .sort({ _id: -1 })
       .limit(limit * 1)
       .skip((page - 1) * limit);
-
+    customers = { customerCount, customers };
     res.status(200).json(customers);
   } catch (err) {
+    console.log("err", err);
     await log(err);
     res.status(500).json(err);
   }
