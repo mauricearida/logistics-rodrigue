@@ -63,7 +63,7 @@ exports.createproduct = async (req, res) => {
         const codeSequence = await Sharedrecords.findById(
           "63663fa59b531a420083d78f"
         );
-        console.log("codeSequence", codeSequence);
+
         let codeid = codeSequence.productcodeid;
         codeid = codeid.toString();
 
@@ -72,7 +72,8 @@ exports.createproduct = async (req, res) => {
         }
         newProduct.generatedCode = codeid;
 
-        const savedProduct = await newProduct.save();
+        let savedProduct = await newProduct.save();
+        savedProduct = await savedProduct.populate("categoryId");
         res.status(200).json(savedProduct);
       }
     } catch (err) {
