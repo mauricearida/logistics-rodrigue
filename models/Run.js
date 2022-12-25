@@ -6,6 +6,7 @@ const RunSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "Route",
     },
+    date: { type: Date },
     note: { type: String },
     driver: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
     vehicle: { type: mongoose.Schema.Types.ObjectId, ref: "Vehicle" },

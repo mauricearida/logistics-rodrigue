@@ -8,12 +8,6 @@ const CustomerSchema = new mongoose.Schema(
     isarchived: { type: Boolean, default: false },
     suburb: { type: String, required: true },
     notes: { type: String },
-    // pendingorders: [
-    //   {
-    //     type: mongoose.Schema.Types.ObjectId,
-    //     ref: "Order",
-    //   },
-    // ],
     ispricingdefault: { type: Boolean, required: true, default: true },
     customername: { type: String, required: true },
     email: { type: String },
@@ -22,7 +16,6 @@ const CustomerSchema = new mongoose.Schema(
     mobilenumber: { type: String },
     directdialnumber: { type: String },
     state: { type: String, required: true },
-    // status: { type: Boolean, required: true, default: false },
     postcode: { type: Number, required: true },
     deliveryoccur: {
       type: mongoose.Schema.Types.ObjectId,
@@ -41,6 +34,10 @@ const CustomerSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "Paymentmethod",
       required: true,
+    },
+    routeId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Route",
     },
     isconsolidatedbiller: { type: Boolean, required: true },
     billerforcustomer: {

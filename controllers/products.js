@@ -116,9 +116,7 @@ exports.deleteProduct = async (req, res) => {
 
 exports.getProduct = async (req, res) => {
   try {
-    const product = await Products.findById(req.params.id).populate(
-      "categoryId"
-    );
+    const product = await Products.findById(req.params.id).populate("category");
     if (product) {
       res.status(200).json(product);
     } else {
@@ -137,7 +135,7 @@ exports.getproductsPaginated = async (req, res) => {
     let visibleProducts = productsCount - hiddenProducts;
     const { page = 1, limit = 5 } = req.query;
     const products = await Products.find()
-      .populate("categoryId")
+      .populate("category")
       .sort("name")
       .limit(limit * 1)
       .skip((page - 1) * limit);
