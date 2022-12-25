@@ -70,7 +70,7 @@ exports.createproduct = async (req, res) => {
         while (codeid.length < 4) {
           codeid = "0" + codeid;
         }
-        newProduct.assignedCode = codeid;
+        newProduct.generatedCode = codeid;
 
         const savedProduct = await newProduct.save();
         res.status(200).json(savedProduct);
