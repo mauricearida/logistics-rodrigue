@@ -45,7 +45,7 @@ exports.deleteOrder = async (req, res) => {
 exports.getOrder = async (req, res) => {
   try {
     const order = await Order.findById(req.params.id)
-      .populate("customer")
+
       .populate({
         path: "products",
         populate: {
@@ -69,20 +69,22 @@ exports.getOrder = async (req, res) => {
 exports.getAllOrders = async (req, res) => {
   try {
     const orders = await Order.find()
-
+      .populate("customer")
       .populate({
         path: "products",
         populate: {
-          path: "productId",
+          path: "product",
           model: "Product",
         },
       })
       .exec();
-
-    //  .populate("customer")
-
+    const orderCount = await Order.countDocuments();
+    let objectTosend = {
+      orderCount,
+      orders,
+    };
     if (orders) {
-      res.status(200).json(orders);
+      res.status(200).json(objectTosend);
     } else {
       return res.status(200).json("No orders found");
     }

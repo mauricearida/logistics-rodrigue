@@ -4,7 +4,7 @@ const User = require("../models/User");
 const { log } = require("../helpers/Loger");
 
 exports.signup = async (req, res) => {
-  const { name, email, phonenumber, username, lastlogin, role } = req.body;
+  const { name, email, phonenumber, username, role } = req.body;
 
   //check if email is duplicate
   const isNewEmailUser = await User.isThisEmailInUse(email);
@@ -40,7 +40,6 @@ exports.signup = async (req, res) => {
     username: username,
     email: email,
     phonenumber: phonenumber,
-    lastlogin: lastlogin,
     role: role,
     password: CryptoJS.AES.encrypt(
       req.body.password,
@@ -70,7 +69,7 @@ exports.login = async (req, res) => {
     const user = await User.findOne({
       username: req.body.username,
     });
-
+    console.log("user", user);
     if (!user) return res.status(400).json("Wrong username or password");
 
     const hashedPassword = CryptoJS.AES.decrypt(
@@ -93,16 +92,20 @@ exports.login = async (req, res) => {
       process.env.JWT_SEC,
       { expiresIn: "3d" }
     );
-    // let AuDate = new Date().toLocaleString("en-US", {
-    //   timeZone: "Australia/Sydney",
-    // });
+    let AuDate = new Date().toISOString("en-US", {
+      timeZone: "Australia/Sydney",
+    });
 
-    user.lastlogin = Date.now();
+    let userId = user._id.toString();
+
+    await User.findByIdAndUpdate(userId, {
+      $set: { lastlogin: AuDate },
+    });
+
     const { password, ...others } = user._doc;
     return res.status(200).json({ ...others, accessToken });
   } catch (err) {
     await log(err);
-    console.log(`err`, err);
     res.status(500).json(err);
   }
 };

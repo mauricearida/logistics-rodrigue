@@ -6,6 +6,7 @@ const PromotionSchema = new mongoose.Schema(
     description: { type: String },
     from: { type: Date },
     to: { type: Date },
+    isCategoryPromotion: { type: Boolean },
     products: [
       {
         productId: {

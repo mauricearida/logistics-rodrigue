@@ -71,13 +71,8 @@ exports.updateCostumer = async (req, res) => {
 
 exports.deleteCostumer = async (req, res) => {
   try {
-    await Customer.findByIdAndDelete(req.params.id);
-    const customerCount = await Customer.find().count();
-    let objectTosend = {
-      customerCount,
-      message: "Customer has been deleted...",
-    };
-    res.status(200).json(objectTosend);
+    const customer = await Customer.findByIdAndDelete(req.params.id);
+    res.status(200).json(customer);
   } catch (err) {
     await log(err);
     res.status(500).json(err);
@@ -102,7 +97,7 @@ exports.getCostumer = async (req, res) => {
 
 exports.getCostumerPaginatedArchived = async (req, res) => {
   try {
-    const customerCount = await Customer.find().count();
+    const customerCount = await Customer.countDocuments();
     const { page, limit, isarchived } = req.query;
     if (!page || !limit || !isarchived)
       return res
@@ -115,8 +110,8 @@ exports.getCostumerPaginatedArchived = async (req, res) => {
       .sort({ _id: -1 })
       .limit(limit * 1)
       .skip((page - 1) * limit);
-    customers = { customerCount, customers };
-    res.status(200).json(customers);
+
+    res.status(200).json({ customerCount, customers });
   } catch (err) {
     console.log("err", err);
     await log(err);

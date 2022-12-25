@@ -43,6 +43,7 @@ exports.validateLogin = [
 
 // Creating Customer
 exports.validateCreateCustomer = [
+  check("abn").trim().not().isEmpty().withMessage("Abn field is missing"),
   check("businessname")
     .trim()
     .not()
@@ -92,6 +93,11 @@ exports.validateCreateCustomer = [
 // Creating Promotion
 exports.creatingPromotion = [
   check("name").trim().not().isEmpty().withMessage("Promotion Name is missing"),
+  check("isCategoryPromotion")
+    .trim()
+    .not()
+    .isEmpty()
+    .withMessage("Promotion type is missing"),
   check("from")
     .trim()
     .not()

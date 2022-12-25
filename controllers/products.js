@@ -1,5 +1,6 @@
 const Products = require("../models/Products");
 const { log } = require("../helpers/Loger");
+const Sharedrecords = require("../models/Sharedrecords");
 
 exports.updateCount = async (req, res) => {
   try {
@@ -23,26 +24,33 @@ exports.updateCount = async (req, res) => {
 };
 
 exports.createproduct = async (req, res) => {
-  const { name, categoryId, unitesperbox, prioritynumber, price, code } =
-    req.body;
+  const {
+    name,
+    categoryId,
+    unitesperbox,
+    prioritynumber,
+    price,
+    assignedcode,
+  } = req.body;
+
   if (
     !name ||
     !categoryId ||
     !unitesperbox ||
     !prioritynumber ||
     !price ||
-    !code
+    !assignedcode
   ) {
     return res.status(400).json("Please fill in all the fields");
   } else {
     const newProduct = new Products(req.body);
 
-    const isNewProductCode = await Products.isThisCodeInUse(code);
+    const isNewProductCode = await Products.isThisCodeInUse(assignedcode);
     if (!isNewProductCode)
       return res.status(400).json({
         success: false,
         message:
-          "This product code is already in use, please enter a different one",
+          "This product assigned code is already in use, please enter a different one",
       });
 
     try {
@@ -52,6 +60,18 @@ exports.createproduct = async (req, res) => {
           .status(403)
           .json("a product with this name has already been created");
       } else {
+        const codeSequence = await Sharedrecords.findById(
+          "63663fa59b531a420083d78f"
+        );
+        console.log("codeSequence", codeSequence);
+        let codeid = codeSequence.productcodeid;
+        codeid = codeid.toString();
+
+        while (codeid.length < 4) {
+          codeid = "0" + codeid;
+        }
+        newProduct.assignedCode = codeid;
+
         const savedProduct = await newProduct.save();
         res.status(200).json(savedProduct);
       }
@@ -109,14 +129,18 @@ exports.getProduct = async (req, res) => {
 
 exports.getproductsPaginated = async (req, res) => {
   try {
-    let productsCount = await Products.count({}).exec();
+    let productsCount = await Products.countDocuments();
+    let hiddenProducts = await Products.countDocuments({ visibility: false });
+    let visibleProducts = productsCount - hiddenProducts;
     const { page = 1, limit = 5 } = req.query;
     const products = await Products.find()
       .sort("name")
       .limit(limit * 1)
       .skip((page - 1) * limit);
 
-    res.status(200).json({ productsCount, products });
+    res
+      .status(200)
+      .json({ productsCount, hiddenProducts, visibleProducts, products });
   } catch (err) {
     await log(err);
     res.status(500).json(err);

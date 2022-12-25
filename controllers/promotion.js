@@ -59,8 +59,15 @@ exports.getPromotion = async (req, res) => {
 exports.getAllPromotions = async (req, res) => {
   try {
     const promotions = await Promotion.find().sort({ _id: -1 });
+    const promotionCount = await Promotion.countDocuments();
+
+    let objectTosend = {
+      promotionCount,
+      promotions,
+    };
+
     if (promotions) {
-      res.status(200).json(promotions);
+      res.status(200).json(objectTosend);
     } else {
       return res.status(200).json("No categories found");
     }

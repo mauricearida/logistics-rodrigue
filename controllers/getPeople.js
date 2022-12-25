@@ -4,6 +4,9 @@ const { log } = require("../helpers/Loger");
 exports.getAllAdmins = async (req, res) => {
   try {
     const users = await User.find({ role: 0 });
+    //=====================
+
+    //=======================
     if (!users)
       return res
         .status(404)

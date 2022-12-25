@@ -83,8 +83,15 @@ exports.getDeliveryOccur = async (req, res) => {
 exports.getAllDeliveryOccur = async (req, res) => {
   try {
     const deliveryOccur = await DeliveryOccur.find().sort({ _id: -1 });
+    const deliveryOccurCount = await DeliveryOccur.countDocuments();
+
+    let objectTosend = {
+      deliveryOccurCount,
+      deliveryOccur,
+    };
+
     if (deliveryOccur) {
-      res.status(200).json(deliveryOccur);
+      res.status(200).json(objectTosend);
     } else {
       res.status(404).json("No delivery occur yet !");
     }

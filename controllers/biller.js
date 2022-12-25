@@ -79,8 +79,13 @@ exports.getBiller = async (req, res) => {
 exports.getAllBillers = async (req, res) => {
   try {
     const billers = await Biller.find().sort({ _id: -1 });
+    const billerCount = await Biller.countDocuments();
+    let objectTosend = {
+      billerCount,
+      billers,
+    };
     if (billers) {
-      res.status(200).json(billers);
+      res.status(200).json(objectTosend);
     } else {
       res.status(404).json("There are no billers");
     }

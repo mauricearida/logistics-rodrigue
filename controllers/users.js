@@ -61,8 +61,12 @@ exports.getAllUsers = async (req, res) => {
       .sort({ _id: -1 })
       .limit(limit * 1)
       .skip((page - 1) * limit);
-
-    res.status(200).json(users);
+    const userCount = await User.countDocuments();
+    let objectTosend = {
+      userCount,
+      users,
+    };
+    res.status(200).json(objectTosend);
   } catch (err) {
     await log(err);
     res.status(500).json(err);

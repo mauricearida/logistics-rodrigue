@@ -23,7 +23,7 @@ const OrderSchema = new mongoose.Schema(
     deliveriesoccur: { type: Number, required: true, default: 0 },
     date: { type: Date },
     notes: { type: String },
-    called: { type: Boolean },
+    called: { type: Number, default: 0 },
     status: { type: Number, required: true, default: 0 },
   },
   { timestamps: true }

@@ -59,8 +59,13 @@ exports.getRun = async (req, res) => {
 exports.getAllRuns = async (req, res) => {
   try {
     const runs = await Run.find().sort({ _id: -1 });
+    const runCount = await Run.countDocuments();
+    let objectTosend = {
+      runCount,
+      runs,
+    };
     if (runs) {
-      res.status(200).json(runs);
+      res.status(200).json(objectTosend);
     } else {
       return res.status(200).json("No runs found");
     }

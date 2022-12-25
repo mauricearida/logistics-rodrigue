@@ -57,9 +57,9 @@ exports.deleteCategory = async (req, res) => {
 exports.getCategory = async (req, res) => {
   try {
     const category = await Category.findById(req.params.id);
-    const productCount = await Products.find({
+    const productCount = await Products.countDocuments({
       categoryId: req.params.id,
-    }).count();
+    });
     console.log("productCount", productCount);
     if (category) {
       category.productCount = productCount;
@@ -77,8 +77,13 @@ exports.getCategory = async (req, res) => {
 exports.getAllCategories = async (req, res) => {
   try {
     const categories = await Category.find().sort({ _id: -1 });
+    const categoryCount = await Category.countDocuments();
+    let objectTosend = {
+      categoryCount,
+      categories,
+    };
     if (categories) {
-      return res.status(200).json(categories);
+      return res.status(200).json(objectTosend);
     } else {
       return res.status(200).json("No categories found");
     }

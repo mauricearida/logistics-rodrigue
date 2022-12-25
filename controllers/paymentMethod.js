@@ -80,8 +80,14 @@ exports.getPaymentMethod = async (req, res) => {
 exports.getAllPaymentMethods = async (req, res) => {
   try {
     const paymentMethods = await Paymentmethod.find().sort({ _id: -1 });
+    const paymentmethodCount = await Paymentmethod.countDocuments();
+    let objectTosend = {
+      paymentmethodCount,
+      paymentMethods,
+    };
+
     if (paymentMethods) {
-      res.status(200).json(paymentMethods);
+      res.status(200).json(objectTosend);
     } else {
       res.status(404).json("No payment methods are created yet !");
     }
