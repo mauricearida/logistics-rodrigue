@@ -73,7 +73,7 @@ exports.createproduct = async (req, res) => {
         newProduct.generatedCode = codeid;
 
         let savedProduct = await newProduct.save();
-        savedProduct = await savedProduct.populate("categoryId");
+
         res.status(200).json(savedProduct);
       }
     } catch (err) {
@@ -116,7 +116,9 @@ exports.deleteProduct = async (req, res) => {
 
 exports.getProduct = async (req, res) => {
   try {
-    const product = await Products.findById(req.params.id);
+    const product = await Products.findById(req.params.id).populate(
+      "categoryId"
+    );
     if (product) {
       res.status(200).json(product);
     } else {
@@ -135,6 +137,7 @@ exports.getproductsPaginated = async (req, res) => {
     let visibleProducts = productsCount - hiddenProducts;
     const { page = 1, limit = 5 } = req.query;
     const products = await Products.find()
+      .populate("categoryId")
       .sort("name")
       .limit(limit * 1)
       .skip((page - 1) * limit);
