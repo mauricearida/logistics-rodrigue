@@ -17,6 +17,7 @@ const CustomerSchema = new mongoose.Schema(
     directdialnumber: { type: String },
     state: { type: String, required: true },
     postcode: { type: Number, required: true },
+    deliveryfee: { type: Number, default: 0 },
     deliveryoccur: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Deliveriesoccur",

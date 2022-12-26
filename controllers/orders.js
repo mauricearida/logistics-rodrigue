@@ -1,12 +1,22 @@
 const Order = require("../models/Orders");
 const { log } = require("../helpers/Loger");
+import moment from "moment";
 
 exports.createOrder = async (req, res) => {
+  const {} = req.body;
   try {
     const newOrder = new Order(req.body);
+
+    console.log("req.body", req.body);
+    let date = new Date();
+
+    console.log("date", date.getDate());
+
     const savedOrder = await newOrder.save();
+
     res.status(200).json(savedOrder);
   } catch (err) {
+    console.log("err", err);
     await log(err);
     res.status(500).json(err);
   }

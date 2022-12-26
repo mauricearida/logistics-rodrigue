@@ -117,6 +117,7 @@ exports.creatingOrder = [
     .not()
     .isEmpty()
     .withMessage("Customer Id is missing"),
+
   check("products")
     .not()
     .isEmpty()
