@@ -6,8 +6,6 @@ const { getComingRuns } = require("./runs");
 const { getCostumerInternally } = require("./costumer");
 
 exports.createOrder = async (req, res) => {
-  const { date, customer } = req.body;
-
   const createNewRun = async (orderDate, newOrder, customerRouteId) => {
     const newRun = new Run({
       date: orderDate,
@@ -17,6 +15,7 @@ exports.createOrder = async (req, res) => {
     const savedRun = await newRun.save();
     return res.status(200).json({ message: "New run is created", savedRun });
   };
+  const { date, customer } = req.body;
   try {
     const newOrder = new Order(req.body);
     let ourCustomer = await getCostumerInternally(customer);
