@@ -117,7 +117,14 @@ exports.creatingOrder = [
     .not()
     .isEmpty()
     .withMessage("Customer Id is missing"),
-
+  check("date")
+    .trim()
+    .not()
+    .isEmpty()
+    .withMessage("date is missing")
+    .isISO8601()
+    .toDate()
+    .withMessage("date is invalid"),
   check("products")
     .not()
     .isEmpty()

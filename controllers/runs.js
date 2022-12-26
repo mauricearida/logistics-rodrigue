@@ -56,6 +56,22 @@ exports.getRun = async (req, res) => {
   }
 };
 
+exports.getComingRuns = async (routeId) => {
+  try {
+    const run = await Run.find({
+      $and: [{ $or: [{ status: 0 }, { status: 1 }] }, { route: routeId }],
+    });
+
+    if (run) {
+      return run;
+    } else {
+      console.log("no runs found");
+    }
+  } catch (err) {
+    console.log("getComingRuns err", err);
+  }
+};
+
 exports.getAllRuns = async (req, res) => {
   try {
     const runs = await Run.find().sort({ _id: -1 });

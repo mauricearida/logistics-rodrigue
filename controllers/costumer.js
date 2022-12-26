@@ -33,15 +33,13 @@ exports.createCostumer = async (req, res) => {
   try {
     const savedCustomer = await newCustomer.save();
     res.status(200).json(savedCustomer);
-    console.log("1111");
-    const updatedOcdeSequence = await Sharedrecords.findByIdAndUpdate(
+    await Sharedrecords.findByIdAndUpdate(
       "63663fa59b531a420083d78f",
       {
         $inc: { customercodeid: 1 },
       },
       { new: true }
     );
-    console.log("updatedOcdeSequence", updatedOcdeSequence);
   } catch (err) {
     console.log("err", err);
     await log(err);
@@ -94,7 +92,18 @@ exports.getCostumer = async (req, res) => {
     res.status(500).json(err);
   }
 };
-
+exports.getCostumerInternally = async (customerId) => {
+  try {
+    const customer = await Customer.findById(customerId);
+    if (customer) {
+      return customer;
+    } else {
+      console.log("no customer found");
+    }
+  } catch (err) {
+    await log(err);
+  }
+};
 exports.getCostumerPaginatedArchived = async (req, res) => {
   try {
     const customerCount = await Customer.countDocuments();
@@ -112,6 +121,15 @@ exports.getCostumerPaginatedArchived = async (req, res) => {
       .skip((page - 1) * limit);
 
     res.status(200).json({ customerCount, customers });
+  } catch (err) {
+    console.log("err", err);
+    await log(err);
+    res.status(500).json(err);
+  }
+};
+exports.findCustomerByTextSearch = async (req, res) => {
+  try {
+    find({ $text: { $search: "java coffee shop" } });
   } catch (err) {
     console.log("err", err);
     await log(err);

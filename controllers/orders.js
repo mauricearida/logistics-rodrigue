@@ -1,22 +1,57 @@
 const Order = require("../models/Orders");
+const Run = require("../models/Run");
 const { log } = require("../helpers/Loger");
-import moment from "moment";
+const moment = require("moment");
+const { getComingRuns } = require("./runs");
+const { getCostumerInternally } = require("./costumer");
 
 exports.createOrder = async (req, res) => {
-  const {} = req.body;
+  const { date, customer } = req.body;
+
+  const createNewRun = async (orderDate, newOrder, customerRouteId) => {
+    const newRun = new Run({
+      date: orderDate,
+      orders: [newOrder],
+      route: customerRouteId,
+    });
+    const savedRun = await newRun.save();
+    return res.status(200).json({ message: "New run is created", savedRun });
+  };
   try {
     const newOrder = new Order(req.body);
+    let ourCustomer = await getCostumerInternally(customer);
+    let customerRouteId = ourCustomer.routeId.toString();
+    const comingRunsArray = await getComingRuns(customerRouteId);
+    // we are getting the runs with status 0 and 1 so we have to terminate runs by end of day if the admin did not
+    //wen badna nhetetla coda hayde ya Emile
+    let orderDate = moment(date).format("L");
 
-    console.log("req.body", req.body);
-    let date = new Date();
+    if (!comingRunsArray.length)
+      return createNewRun(orderDate, newOrder, customerRouteId);
 
-    console.log("date", date.getDate());
+    for (let i = 0; i < comingRunsArray.length; i++) {
+      let runDates = comingRunsArray[i].date;
+      let runDate = moment(runDates).format("L");
+      let runRouteId = comingRunsArray[i].route.toString();
 
-    const savedOrder = await newOrder.save();
+      if (runDate == orderDate && customerRouteId == runRouteId) {
+        let runId = comingRunsArray[i]._id.toString();
 
-    res.status(200).json(savedOrder);
+        const ourRun = await Run.findByIdAndUpdate(
+          runId,
+          { $push: { orders: newOrder } },
+          { new: true }
+        );
+        return res.status(200).json({
+          message: "Order is added to already created run at that date",
+          ourRun,
+        });
+      } else {
+        createNewRun(orderDate, newOrder, customerRouteId);
+      }
+    }
   } catch (err) {
-    console.log("err", err);
+    console.log("createOrder err", err);
     await log(err);
     res.status(500).json(err);
   }

@@ -47,7 +47,6 @@ UserSchema.statics.isThisPhoneInUse = async function (phone) {
   try {
     const user = await this.findOne({ phone });
     if (user) return false;
-    console.log("11111");
     return true;
   } catch (error) {
     console.error(`error inside isThisUsernameInUse method`, error.message);

@@ -23,7 +23,7 @@ const OrderSchema = new mongoose.Schema(
     deliveriesoccur: { type: Number, required: true, default: 0 },
     date: { type: Date },
     notes: { type: String },
-    status: { type: Number, required: true, default: 0 },
+    status: { type: Number, default: 0 },
   },
   { timestamps: true }
 );
