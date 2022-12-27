@@ -130,9 +130,15 @@ exports.getCostumerPaginatedArchived = async (req, res) => {
 exports.findCustomerByTextSearch = async (req, res) => {
   const { find } = req.query;
   try {
-    const found = await Customer.find({ $text: { $search: "asd" } });
-
-    console.log("found", found);
+    const found = await Customer.find({
+      $or: [
+        { businessname: { $regex: find, $options: "i" } },
+        { codeid: { $regex: find, $options: "i" } },
+      ],
+    });
+    
+    if (!found) return res.status(404).json("no customer was found");
+    return res.status(200).json(found);
   } catch (err) {
     console.log("err", err);
     await log(err);
