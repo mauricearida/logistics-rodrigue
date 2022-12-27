@@ -156,7 +156,7 @@ exports.findProductsByTextSearch = async (req, res) => {
       $or: [
         { name: { $regex: find, $options: "i" } },
         { assignedCode: { $regex: find, $options: "i" } },
-        { category: { $regex: find, $options: "i" } },
+        { categoryId: { $regex: find, $options: "i" } },
       ],
     });
 

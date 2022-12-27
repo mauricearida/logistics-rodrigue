@@ -63,7 +63,7 @@ exports.getCategory = async (req, res) => {
     console.log("productCount", productCount);
     if (category) {
       category.productCount = productCount;
-      console.log("category", category);
+
       res.status(200).json(category);
     } else {
       res.status(404).json("There is no category with this id");
