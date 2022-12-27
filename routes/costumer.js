@@ -5,6 +5,7 @@ const {
   deleteCostumer,
   getCostumer,
   getCostumerPaginatedArchived,
+  findCustomerByTextSearch,
 } = require("../controllers/costumer");
 const {
   validateCreateCustomer,
@@ -13,6 +14,7 @@ const {
 } = require("../middlewares/validators");
 const { verifyTokenAndAdmin } = require("../middlewares/verifyToken");
 
+router.route("/find").post(verifyTokenAndAdmin, findCustomerByTextSearch);
 router
   .route("/")
   .post(verifyTokenAndAdmin, validateCreateCustomer, validate, createCostumer)

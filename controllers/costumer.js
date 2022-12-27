@@ -128,10 +128,11 @@ exports.getCostumerPaginatedArchived = async (req, res) => {
   }
 };
 exports.findCustomerByTextSearch = async (req, res) => {
+  const { find } = req.query;
   try {
-    const retreivedArray = await Sharedrecords.find({
-      $text: { $search: "java coffee shop" },
-    });
+    const found = await Customer.find({ $text: { $search: "asd" } });
+
+    console.log("found", found);
   } catch (err) {
     console.log("err", err);
     await log(err);
