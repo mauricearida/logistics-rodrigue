@@ -5,7 +5,7 @@ const ProductSchema = new mongoose.Schema(
     name: { type: String, required: true, unique: true },
     assignedCode: { type: String },
     generatedCode: { type: String },
-    category: {
+    categoryId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Category",
       required: true,
