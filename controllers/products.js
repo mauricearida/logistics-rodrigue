@@ -148,3 +148,22 @@ exports.getproductsPaginated = async (req, res) => {
     res.status(500).json(err);
   }
 };
+
+exports.findProductsByTextSearch = async (req, res) => {
+  const { find } = req.query;
+  try {
+    const found = await Products.find({
+      $or: [
+        { businessname: { $regex: find, $options: "i" } },
+        { codeid: { $regex: find, $options: "i" } },
+      ],
+    });
+
+    if (!found) return res.status(404).json("No Products were found");
+    return res.status(200).json(found);
+  } catch (err) {
+    console.log("err", err);
+    await log(err);
+    res.status(500).json(err);
+  }
+};
