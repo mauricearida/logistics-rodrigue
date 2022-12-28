@@ -19,7 +19,7 @@ exports.createpromotion = async (req, res) => {
       });
     }
 
-    if (!(JSON.stringify(productspromotion) == "{}")) {
+    if (!Object.keys(productspromotion).length === 0) {
       let promotionproduct = await Products.findById(
         productspromotion.productId
       );
@@ -38,7 +38,7 @@ exports.createpromotion = async (req, res) => {
           message:
             "Please enter a lower price than the ususal one to create a promotion",
         });
-    } else if (!(JSON.stringify(categorypromotion) == "{}")) {
+    } else if (!Object.keys(categorypromotion).length === 0) {
       let promotioncategoryId = await Category.findById(
         categorypromotion.categoryId
       );
