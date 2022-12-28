@@ -15,12 +15,12 @@ exports.createpromotion = async (req, res) => {
     if (objectsAreSamelyFullfilled) {
       return res.status(400).json({
         success: false,
-        message: "Please fill in one type of promotion",
+        message: "Please fill in with only one type of promotion",
       });
     }
 
     if (!(Object.keys(productspromotion).length === 0)) {
-      let promotionproduct = await Products.findById(
+      const promotionproduct = await Products.findById(
         productspromotion.productId
       );
 
@@ -39,7 +39,7 @@ exports.createpromotion = async (req, res) => {
             "Please enter a lower price than the ususal one to create a promotion",
         });
     } else {
-      let promotioncategoryId = await Category.findById(
+      const promotioncategoryId = await Category.findById(
         categorypromotion.categoryId
       );
       if (!promotioncategoryId)
