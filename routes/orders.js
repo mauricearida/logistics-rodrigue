@@ -5,6 +5,7 @@ const {
   deleteOrder,
   getOrder,
   getAllOrders,
+  sendUserToCreateOrder,
 } = require("../controllers/orders");
 const {
   validateMongoId,
@@ -12,6 +13,10 @@ const {
   creatingOrder,
 } = require("../middlewares/validators");
 const { verifyTokenAndAdmin } = require("../middlewares/verifyToken");
+
+router
+  .route("/senduseridfororder/:id")
+  .post(verifyTokenAndAdmin, sendUserToCreateOrder);
 
 router
   .route("/")

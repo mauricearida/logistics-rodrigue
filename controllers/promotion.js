@@ -1,12 +1,56 @@
 const Promotion = require("../models/Promotion");
 const { log } = require("../helpers/Loger");
+const Products = require("../models/Products");
+const Category = require("../models/Category");
 
 exports.createpromotion = async (req, res) => {
-  const newPromotion = new Promotion(req.body);
+  const { productspromotion, categorypromotion } = req.body;
   try {
+    const newPromotion = new Promotion(req.body);
+    if (productspromotion.length && categorypromotion.length)
+      return res.status(400).json({
+        success: false,
+        message:
+          "Cannot set a promotion for products and categories at the same time",
+      });
+
+    if (productspromotion.length) {
+      for (let i = 0; i < productspromotion.length; i++) {
+        let promotionproduct = await Products.findById(
+          productspromotion[i].productId
+        );
+        if (!promotionproduct)
+          return res.status(404).json({
+            success: false,
+            message: "Could not find product by this id",
+          });
+
+        let originalproductprice = promotionproduct.price;
+
+        if (originalproductprice <= productspromotion[i].newprice)
+          return res.status(400).json({
+            success: false,
+            message:
+              "Please enter a lower price than the ususal one to create a promotion",
+          });
+      }
+    } else {
+      for (let i = 0; i < categorypromotion.length; i++) {
+        let promotioncategoryId = await Category.findById(
+          categorypromotion[i].categoryId
+        );
+        if (!promotioncategoryId)
+          return res.status(404).json({
+            success: false,
+            message: "Could not find category by this id",
+          });
+      }
+    }
+
     const savedPromotion = await newPromotion.save();
-    res.status(200).json(savedPromotion);
+    return res.status(200).json({ success: true, data: savedPromotion });
   } catch (err) {
+    console.log("createpromotion err", err);
     await log(err);
     res.status(500).json(err);
   }

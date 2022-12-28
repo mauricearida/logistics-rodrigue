@@ -4,6 +4,24 @@ const { log } = require("../helpers/Loger");
 const moment = require("moment");
 const { getComingRuns } = require("./runs");
 const { getCostumerInternally } = require("./costumer");
+const Customer = require("../models/Customer");
+
+exports.sendUserToCreateOrder = async (req, res) => {
+  try {
+    const customer = await Customer.findById(req.params.id);
+
+    if (!customer)
+      return res
+        .status(404)
+        .json({ success: false, message: "No customer is found by this Id!" });
+
+    console.log("customer", customer);
+  } catch (e) {
+    console.log("sendUserToCreateOrder err", err);
+    await log(err);
+    res.status(500).json(err);
+  }
+};
 
 exports.createOrder = async (req, res) => {
   const createNewRun = async (orderDate, newOrder, customerRouteId) => {
