@@ -7,6 +7,65 @@ exports.createpromotion = async (req, res) => {
   const { productspromotion, categorypromotion } = req.body;
   try {
     const newPromotion = new Promotion(req.body);
+
+    let bothObjectAreNotEmpty =
+      !(JSON.stringify(productspromotion) == "{}") &&
+      !(JSON.stringify(categorypromotion) == "{}");
+
+    let bothObjectAreEmpty =
+      JSON.stringify(productspromotion) == "{}" &&
+      JSON.stringify(categorypromotion) == "{}";
+
+    if (bothObjectAreEmpty || bothObjectAreNotEmpty) {
+      return res.status(400).json({
+        success: false,
+        message: "Please fill in one type of promotion",
+      });
+    }
+
+    if (!(JSON.stringify(productspromotion) == "{}")) {
+      let promotionproduct = await Products.findById(
+        productspromotion.productId
+      );
+
+      if (!promotionproduct)
+        return res.status(404).json({
+          success: false,
+          message: "Could not find product by this id",
+        });
+
+      let originalproductprice = promotionproduct.price;
+
+      if (originalproductprice <= productspromotion.newprice)
+        return res.status(400).json({
+          success: false,
+          message:
+            "Please enter a lower price than the ususal one to create a promotion",
+        });
+    } else if (!(JSON.stringify(categorypromotion) == "{}")) {
+      let promotioncategoryId = await Category.findById(
+        categorypromotion.categoryId
+      );
+      if (!promotioncategoryId)
+        return res.status(404).json({
+          success: false,
+          message: "Could not find category by this id",
+        });
+    }
+
+    const savedPromotion = await newPromotion.save();
+    return res.status(200).json({ success: true, data: savedPromotion });
+  } catch (err) {
+    console.log("createpromotion err", err);
+    await log(err);
+    res.status(500).json(err);
+  }
+};
+
+exports.updatePromotion = async (req, res) => {
+  const { productspromotion, categorypromotion } = req.body;
+
+  try {
     if (productspromotion.length && categorypromotion.length)
       return res.status(400).json({
         success: false,
@@ -47,17 +106,6 @@ exports.createpromotion = async (req, res) => {
       }
     }
 
-    const savedPromotion = await newPromotion.save();
-    return res.status(200).json({ success: true, data: savedPromotion });
-  } catch (err) {
-    console.log("createpromotion err", err);
-    await log(err);
-    res.status(500).json(err);
-  }
-};
-
-exports.updatePromotion = async (req, res) => {
-  try {
     const updatedPromotion = await Promotion.findByIdAndUpdate(
       req.params.id,
       {
@@ -66,9 +114,9 @@ exports.updatePromotion = async (req, res) => {
       { new: true }
     );
     if (updatedPromotion) {
-      res.status(200).json(updatedPromotion);
+      return res.status(200).json(updatedPromotion);
     } else {
-      res.status(404).json("No promotion was found with this id !");
+      return res.status(404).json("No promotion was found with this id !");
     }
   } catch (err) {
     await log(err);

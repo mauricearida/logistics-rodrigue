@@ -116,11 +116,13 @@ exports.deleteProduct = async (req, res) => {
 
 exports.getProduct = async (req, res) => {
   try {
-    const product = await Products.findById(req.params.id).populate("category");
+    const product = await Products.findById(req.params.id).populate(
+      "categoryId"
+    );
     if (product) {
-      res.status(200).json(product);
+      return res.status(200).json(product);
     } else {
-      res.status(404).json("No product was found with this id !");
+      return res.status(404).json("No product was found with this id !");
     }
   } catch (err) {
     await log(err);

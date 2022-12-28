@@ -6,24 +6,20 @@ const PromotionSchema = new mongoose.Schema(
     description: { type: String },
     from: { type: Date },
     to: { type: Date },
-    categorypromotion: [
-      {
-        categoryId: {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: "Category",
-        },
-        discountpercentage: { type: Number },
+    categorypromotion: {
+      categoryId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Category",
       },
-    ],
-    productspromotion: [
-      {
-        productId: {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: "Product",
-        },
-        newprice: { type: Number },
+      discountpercentage: { type: Number },
+    },
+    productspromotion: {
+      productId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Product",
       },
-    ],
+      newprice: { type: Number },
+    },
   },
   { timestamps: true }
 );

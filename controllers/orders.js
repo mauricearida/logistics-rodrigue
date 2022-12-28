@@ -5,18 +5,77 @@ const moment = require("moment");
 const { getComingRuns } = require("./runs");
 const { getCostumerInternally } = require("./costumer");
 const Customer = require("../models/Customer");
+const Products = require("../models/Products");
+const Promotion = require("../models/Promotion");
+
+// categoryId : 637f6a534400796975c53978
+// product for the category : 63aca5d0dad0f5e3be37fc62
+// promotion for category : 63aca5f3dad0f5e3be37fc67
+// promotion for product : 63aca7942d23fb9f1e05c11a
+
+// customer id : 63aca80d741602656b1d824e
 
 exports.sendUserToCreateOrder = async (req, res) => {
   try {
     const customer = await Customer.findById(req.params.id);
-
+    //  console.log("customer", customer);
+    let customerproductpromotions = [];
+    let customercategorypromotions = [];
     if (!customer)
       return res
         .status(404)
         .json({ success: false, message: "No customer is found by this Id!" });
 
-    console.log("customer", customer);
-  } catch (e) {
+    if (!customer.promotions.length)
+      return res.status(200).json({
+        success: true,
+        message: "The customer doesn't have any promotions",
+      });
+
+    let promotionsArray = customer.promotions;
+    for (let i = 0; i < promotionsArray.length; i++) {
+      const promotion = await Promotion.findById(promotionsArray[i].toString());
+      if (!promotion)
+        return res.status(404).json({
+          success: false,
+          message: `the promotion with id ${promotionsArray[i]} is not valid`,
+        });
+      if (promotion.categorypromotion.length) {
+        console.log("1111111111");
+        // console.log("promotion", promotion);
+        customercategorypromotions.push(
+          promotion.categorypromotion.categoryId.toString()
+        );
+        console.log("2222222");
+      } else if (promotion.productspromotion.length) {
+        console.log("33333333");
+        customerproductpromotions.push(
+          promotion.productspromotion.productId.toString()
+        );
+        console.log("44444444");
+      } else {
+        return res
+          .status(404)
+          .json({ success: false, message: "promotion has no details in it" });
+      }
+    }
+
+    // console.log("customerproductpromotions", customerproductpromotions);
+    // console.log("customercategorypromotions", customercategorypromotions);
+
+    const products = await Products.find();
+
+    for (let j = 0; j < products.length; j++) {
+      console.log(
+        "customerproductpromotions.productspromotion",
+        customerproductpromotions
+      );
+      console.log("products[j]._id", products[j]._id.toString());
+      if (customerproductpromotions.includes(products[j]._id.toString())) {
+        console.log("35353535353");
+      }
+    }
+  } catch (err) {
     console.log("sendUserToCreateOrder err", err);
     await log(err);
     res.status(500).json(err);
