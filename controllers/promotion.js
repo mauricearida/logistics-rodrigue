@@ -8,18 +8,18 @@ exports.createpromotion = async (req, res) => {
   try {
     const newPromotion = new Promotion(req.body);
 
-    let objectsAreBothFilled =
+    let objectsAreSamelyFullfilled =
       Object.keys(productspromotion).length ===
       Object.keys(categorypromotion).length;
 
-    if (objectsAreBothFilled) {
+    if (objectsAreSamelyFullfilled) {
       return res.status(400).json({
         success: false,
         message: "Please fill in one type of promotion",
       });
     }
 
-    if (!Object.keys(productspromotion).length === 0) {
+    if (!(Object.keys(productspromotion).length === 0)) {
       let promotionproduct = await Products.findById(
         productspromotion.productId
       );
@@ -38,7 +38,7 @@ exports.createpromotion = async (req, res) => {
           message:
             "Please enter a lower price than the ususal one to create a promotion",
         });
-    } else if (!Object.keys(categorypromotion).length === 0) {
+    } else {
       let promotioncategoryId = await Category.findById(
         categorypromotion.categoryId
       );
