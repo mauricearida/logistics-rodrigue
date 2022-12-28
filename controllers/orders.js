@@ -41,18 +41,13 @@ exports.sendUserToCreateOrder = async (req, res) => {
           message: `the promotion with id ${promotionsArray[i]} is not valid`,
         });
       if (promotion.categorypromotion.length) {
-        console.log("1111111111");
-        // console.log("promotion", promotion);
         customercategorypromotions.push(
           promotion.categorypromotion.categoryId.toString()
         );
-        console.log("2222222");
       } else if (promotion.productspromotion.length) {
-        console.log("33333333");
         customerproductpromotions.push(
           promotion.productspromotion.productId.toString()
         );
-        console.log("44444444");
       } else {
         return res
           .status(404)

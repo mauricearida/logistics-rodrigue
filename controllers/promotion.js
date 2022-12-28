@@ -8,15 +8,11 @@ exports.createpromotion = async (req, res) => {
   try {
     const newPromotion = new Promotion(req.body);
 
-    let bothObjectAreNotEmpty =
-      !(JSON.stringify(productspromotion) == "{}") &&
-      !(JSON.stringify(categorypromotion) == "{}");
+    let objectsAreBothFilled =
+      Object.keys(productspromotion).length ===
+      Object.keys(categorypromotion).length;
 
-    let bothObjectAreEmpty =
-      JSON.stringify(productspromotion) == "{}" &&
-      JSON.stringify(categorypromotion) == "{}";
-
-    if (bothObjectAreEmpty || bothObjectAreNotEmpty) {
+    if (objectsAreBothFilled) {
       return res.status(400).json({
         success: false,
         message: "Please fill in one type of promotion",
