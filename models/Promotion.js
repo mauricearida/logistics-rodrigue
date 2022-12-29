@@ -13,13 +13,15 @@ const PromotionSchema = new mongoose.Schema(
       },
       discountpercentage: { type: Number },
     },
-    productspromotion: {
-      productId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Product",
+    productspromotion: [
+      {
+        productId: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "Product",
+        },
+        newprice: { type: Number },
       },
-      newprice: { type: Number },
-    },
+    ],
   },
   { timestamps: true }
 );
