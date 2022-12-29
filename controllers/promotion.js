@@ -62,46 +62,46 @@ exports.updatePromotion = async (req, res) => {
   const { productspromotion, categorypromotion } = req.body;
 
   try {
-    if (productspromotion.length && categorypromotion.length)
+    let objectsAreSamelyFullfilled =
+      Object.keys(productspromotion).length ===
+      Object.keys(categorypromotion).length;
+
+    if (objectsAreSamelyFullfilled) {
       return res.status(400).json({
         success: false,
-        message:
-          "Cannot set a promotion for products and categories at the same time",
+        message: "Please fill in with only one type of promotion",
       });
-
-    if (productspromotion.length) {
-      for (let i = 0; i < productspromotion.length; i++) {
-        let promotionproduct = await Products.findById(
-          productspromotion[i].productId
-        );
-        if (!promotionproduct)
-          return res.status(404).json({
-            success: false,
-            message: "Could not find product by this id",
-          });
-
-        let originalproductprice = promotionproduct.price;
-
-        if (originalproductprice <= productspromotion[i].newprice)
-          return res.status(400).json({
-            success: false,
-            message:
-              "Please enter a lower price than the ususal one to create a promotion",
-          });
-      }
-    } else {
-      for (let i = 0; i < categorypromotion.length; i++) {
-        let promotioncategoryId = await Category.findById(
-          categorypromotion[i].categoryId
-        );
-        if (!promotioncategoryId)
-          return res.status(404).json({
-            success: false,
-            message: "Could not find category by this id",
-          });
-      }
     }
 
+    if (!(Object.keys(productspromotion).length === 0)) {
+      const promotionproduct = await Products.findById(
+        productspromotion.productId
+      );
+
+      if (!promotionproduct)
+        return res.status(404).json({
+          success: false,
+          message: "Could not find product by this id",
+        });
+
+      let originalproductprice = promotionproduct.price;
+
+      if (originalproductprice <= productspromotion.newprice)
+        return res.status(400).json({
+          success: false,
+          message:
+            "Please enter a lower price than the ususal one to create a promotion",
+        });
+    } else {
+      const promotioncategoryId = await Category.findById(
+        categorypromotion.categoryId
+      );
+      if (!promotioncategoryId)
+        return res.status(404).json({
+          success: false,
+          message: "Could not find category by this id",
+        });
+    }
     const updatedPromotion = await Promotion.findByIdAndUpdate(
       req.params.id,
       {
