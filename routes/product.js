@@ -19,7 +19,6 @@ const { verifyTokenAndAdmin } = require("../middlewares/verifyToken");
 router.route("/updatecount").put(verifyTokenAndAdmin, updateCount);
 router.route("/find").post(verifyTokenAndAdmin, findProductsByTextSearch);
 
-findProductsByTextSearch;
 router
   .route("/")
   .post(verifyTokenAndAdmin, validateCategoryId, validate, createproduct)

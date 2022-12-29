@@ -26,11 +26,16 @@ exports.sendUserToCreateOrder = async (req, res) => {
         .status(404)
         .json({ success: false, message: "No customer is found by this Id!" });
 
-    if (!customer.promotions.length)
+    if (!customer.promotions.length) {
+      //===============================================================
+      let products = await Products.find();
+      //===============================================================
+
       return res.status(200).json({
         success: true,
         message: "The customer doesn't have any promotions",
       });
+    }
 
     let promotionsArray = customer.promotions;
     for (let i = 0; i < promotionsArray.length; i++) {
