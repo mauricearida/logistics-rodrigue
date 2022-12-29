@@ -11,6 +11,7 @@ const ProductSchema = new mongoose.Schema(
       required: true,
     },
     price: { type: Number, required: true },
+    promotionPrice: { type: Number },
     unitesperbox: { type: Number, required: true },
     prioritynumber: { type: Number, required: true },
     visibility: { type: Boolean, default: true },

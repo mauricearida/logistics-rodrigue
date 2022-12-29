@@ -11,10 +11,10 @@ const Promotion = require("../models/Promotion");
 // product in the category : 63add3962559a78369d50f38
 // categoryId of the product : 637d106099d3a83673e6a476
 
-// promotion for product : 63add34b2559a78369d50f33
-// promotion for category : 63add3fe2559a78369d50f3d
+// promotion for product : 63adf32dfcaec9073efed377
+// promotion for category : 63adf3abfcaec9073efed381
 
-// customer id : 63add4482559a78369d50f44
+// customer id : 63adf422fcaec9073efed387
 
 exports.sendCustomeIdToCreateOrder = async (req, res) => {
   try {
@@ -30,11 +30,12 @@ exports.sendCustomeIdToCreateOrder = async (req, res) => {
     }
 
     if (!customer.promotions.length) {
+      const products = await Products.find();
       return res.status(200).json({
         success: true,
         message: "The customer doesn't have any promotions",
+        data: products,
       });
-      //wade l products
     }
 
     let promotionsArray = customer.promotions;
@@ -46,35 +47,78 @@ exports.sendCustomeIdToCreateOrder = async (req, res) => {
           success: false,
           message: `the promotion with id ${promotionsArray[i]} is not valid`,
         });
+
       let now = new Date();
-      if (
-        !(JSON.stringify(promotion.categorypromotion) == "{}") &&
-        promotion.from < now &&
-        promotion.to > now
-      ) {
+      let fromDate = new Date(promotion.from);
+      let toDate = new Date(promotion.to);
+
+      if (fromDate > now || toDate < now) {
+        return res.status(403).json({
+          success: false,
+          message: `The promotion with id ${promotionsArray[i]} has an expired or date to come`,
+        });
+      }
+
+      if (!(JSON.stringify(promotion.categorypromotion) == "{}")) {
         customercategorypromotions.push(promotion);
-      } else if (
-        !(JSON.stringify(promotion.productspromotion) == "{}") &&
-        promotion.from < now &&
-        promotion.to > now
-      ) {
+      } else if (promotion.productspromotion.length) {
         customerproductpromotions.push(promotion);
       }
     }
-    console.log("customerproductpromotions", customerproductpromotions);
-    console.log("customercategorypromotions", customercategorypromotions);
-    // const products = await Products.find();
+    // console.log("customerproductpromotions", customerproductpromotions);
+    // console.log("customercategorypromotions", customercategorypromotions);
 
-    // for (let j = 0; j < products.length; j++) {
-    //   console.log(
-    //     "customerproductpromotions.productspromotion",
-    //     customerproductpromotions
-    //   );
-    //   console.log("products[j]._id", products[j]._id.toString());
-    //   if (customerproductpromotions.includes(products[j]._id.toString())) {
-    //     console.log("35353535353");
-    //   }
-    // }
+    const products = await Products.find();
+
+    let customerCategoryPromotionsIds = [];
+    let customerProductsPromotionsIds = [];
+
+    customercategorypromotions.forEach(
+      (cat) =>
+        (customerCategoryPromotionsIds = [
+          ...customerCategoryPromotionsIds,
+          cat.categorypromotion.categoryId.toString(),
+        ])
+    );
+
+    customerproductpromotions.forEach((promotion) =>
+      promotion.productspromotion.forEach((product) => {
+        customerProductsPromotionsIds = [
+          ...customerProductsPromotionsIds,
+          product.productId.toString(),
+        ];
+      })
+    );
+
+    products.forEach((product) => {
+      if (
+        customerCategoryPromotionsIds.includes(product.categoryId.toString())
+      ) {
+        let discountPercentage = customercategorypromotions.filter(
+          (cat) =>
+            cat.categorypromotion.categoryId.toString() ===
+            product.categoryId.toString()
+        )[0].categorypromotion.discountpercentage;
+
+        product.promotionPrice =
+          product.price * ((100 - discountPercentage) / 100);
+      }
+      if (customerProductsPromotionsIds.includes(product._id.toString())) {
+        console.log(
+          "customerproductpromotions",
+          customerproductpromotions[0].productspromotion
+        );
+        let newPrice = customerproductpromotions.filter(
+          (prod) =>
+            prod.productspromotion[0].productId.toString() ===
+            product._id.toString()
+        )[0].productspromotion[0].newprice;
+
+        product.promotionPrice = newPrice;
+
+        console.log("product", product);
+      }
+    });
   } catch (err) {
     console.log("sendCustomeIdToCreateOrder err", err);
     await log(err);
