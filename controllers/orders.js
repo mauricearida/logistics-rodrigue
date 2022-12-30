@@ -19,6 +19,16 @@ const Promotion = require("../models/Promotion");
 exports.sendCustomeIdToCreateOrder = async (req, res) => {
   try {
     console.clear();
+    const { page, limit, isarchived } = req.query;
+
+    if (!page || !limit || !isarchived)
+      return res
+        .status(400)
+        .json(
+          "the required query parameters are : page and limit and isarchived"
+        );
+
+    //===================
     const customer = await Customer.findById(req.params.id);
     let customerproductpromotions = [];
     let customercategorypromotions = [];
@@ -30,7 +40,10 @@ exports.sendCustomeIdToCreateOrder = async (req, res) => {
     }
 
     if (!customer.promotions.length) {
-      const products = await Products.find();
+      const products = await Products.find({ isarchived: isarchived })
+        .limit(limit * 1)
+        .skip((page - 1) * limit);
+
       return res.status(200).json({
         success: true,
         message: "The customer doesn't have any promotions",
@@ -65,10 +78,10 @@ exports.sendCustomeIdToCreateOrder = async (req, res) => {
         customerproductpromotions.push(promotion);
       }
     }
-    // console.log("customerproductpromotions", customerproductpromotions);
-    // console.log("customercategorypromotions", customercategorypromotions);
 
-    const products = await Products.find();
+    const products = await Products.find({ isarchived: isarchived })
+      .limit(limit * 1)
+      .skip((page - 1) * limit);
 
     let customerCategoryPromotionsIds = [];
     let customerProductsPromotionsIds = [];
@@ -104,10 +117,6 @@ exports.sendCustomeIdToCreateOrder = async (req, res) => {
           product.price * ((100 - discountPercentage) / 100);
       }
       if (customerProductsPromotionsIds.includes(product._id.toString())) {
-        console.log(
-          "customerproductpromotions",
-          customerproductpromotions[0].productspromotion
-        );
         let newPrice = customerproductpromotions.filter(
           (prod) =>
             prod.productspromotion[0].productId.toString() ===
@@ -115,9 +124,14 @@ exports.sendCustomeIdToCreateOrder = async (req, res) => {
         )[0].productspromotion[0].newprice;
 
         product.promotionPrice = newPrice;
-
-        console.log("product", product);
       }
+    });
+
+    return res.status(200).json({
+      succes: true,
+      message:
+        "The products' new prices are computated as for the customer's promotions",
+      data: products,
     });
   } catch (err) {
     console.log("sendCustomeIdToCreateOrder err", err);

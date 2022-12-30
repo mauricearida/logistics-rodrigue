@@ -1,0 +1,99 @@
+const Organization = require("../models/Organization");
+const { log } = require("../helpers/Loger");
+
+exports.createOrganization = async (req, res) => {
+  try {
+    const { name, customers } = req.body;
+    const newOrganization = new Organization(req.body);
+
+    const isNewOrganizationName =
+      await Organization.isThisOrganizationNameInUse(name);
+
+    if (!isNewOrganizationName)
+      return res.status(400).json({
+        success: false,
+        message: "This organization name is already in use",
+      });
+
+    const savedOrganization = await newOrganization.save();
+    res.status(200).json(savedOrganization);
+  } catch (err) {
+    console.log("createOrganization err", err);
+    await log(err);
+    res.status(500).json(err);
+  }
+};
+
+exports.updateOrganization = async (req, res) => {
+  try {
+    const { name } = req.body;
+    if (name) {
+      const isNewBusinessName = await Organization.isThisOrganizationNameInUse(
+        name
+      );
+      if (!isNewBusinessName)
+        return res.status(400).json({
+          success: false,
+          message: "This organization name is already is use",
+        });
+    }
+    const updatedOrganization = await Organization.findByIdAndUpdate(
+      req.params.id,
+      {
+        $set: req.body,
+      },
+      { new: true }
+    );
+    if (updatedOrganization) {
+      res.status(200).json(updatedOrganization);
+    } else {
+      res.status(404).json("No organization was found with this id !");
+    }
+  } catch (err) {
+    await log(err);
+    res.status(500).json(err);
+  }
+};
+
+exports.deleteOrganization = async (req, res) => {
+  try {
+    await Organization.findByIdAndDelete(req.params.id);
+    res.status(200).json("Organization has been deleted...");
+  } catch (err) {
+    await log(err);
+    res.status(500).json(err);
+  }
+};
+
+exports.getOrganization = async (req, res) => {
+  try {
+    const organization = await Organization.findById(req.params.id);
+    if (organization) {
+      res.status(200).json(organization);
+    } else {
+      res.status(404).json("No organization was found with this id !");
+    }
+  } catch (err) {
+    await log(err);
+    res.status(500).json(err);
+  }
+};
+
+exports.getAllOrganizations = async (req, res) => {
+  try {
+    const organizations = await Organization.find().sort({ _id: -1 });
+    const organizationCount = await Organization.countDocuments();
+    let objectTosend = {
+      organizationCount,
+      organizations,
+    };
+    if (organizations) {
+      res.status(200).json(objectTosend);
+    } else {
+      return res.status(200).json("No organizations found");
+    }
+  } catch (err) {
+    await log(err);
+    res.status(500).json(err);
+  }
+};
