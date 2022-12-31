@@ -18,7 +18,7 @@ const OrderSchema = new mongoose.Schema(
           type: Number,
           default: 1,
         },
-        price: { type: Number, default: 0 },
+        pricePerUnit: { type: Number, default: 0 },
       },
     ],
     totalamount: { type: Number },

@@ -102,11 +102,6 @@ exports.creatingOrder = [
     .not()
     .isEmpty()
     .withMessage("Customer Id is missing"),
-  check("totalamount")
-    .trim()
-    .not()
-    .isEmpty()
-    .withMessage("Total amount is missing"),
   check("date")
     .trim()
     .not()

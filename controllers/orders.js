@@ -141,6 +141,7 @@ exports.sendCustomeIdToCreateOrder = async (req, res) => {
 };
 
 exports.createOrder = async (req, res) => {
+  console.clear();
   const createNewRun = async (orderDate, newOrder, customerRouteId) => {
     const newRun = new Run({
       date: orderDate,
@@ -150,10 +151,17 @@ exports.createOrder = async (req, res) => {
     const savedRun = await newRun.save();
     return res.status(200).json({ message: "New run is created", savedRun });
   };
-  const { date, customer } = req.body;
+  const { date, customer, products } = req.body;
   try {
-    const newOrder = await Order.create(req.body);
-
+    const newOrder = new Order(req.body);
+    let amount = 0;
+    for (let j = 0; j < products.length; j++) {
+      let quantity = products[j].quantity;
+      let pricePerUnit = products[j].pricePerUnit;
+      amount = amount + quantity * pricePerUnit;
+    }
+    newOrder.totalamount = amount;
+    await newOrder.save();
     let ourCustomer = await getCostumerInternally(customer);
 
     if (!ourCustomer)
@@ -166,15 +174,16 @@ exports.createOrder = async (req, res) => {
     //wen badna nhetetla coda hayde ya Emile
     let orderDate = moment(date).format("L");
 
-    if (!comingRunsArray.length)
+    if (!comingRunsArray.length) {
       return createNewRun(orderDate, newOrder, customerRouteId);
+    }
 
     for (let i = 0; i < comingRunsArray.length; i++) {
-      let runDates = comingRunsArray[i].date;
-      let runDate = moment(runDates).format("L");
+      let runDate = comingRunsArray[i].date;
+      let formattedRunDate = moment(runDate).format("L");
       let runRouteId = comingRunsArray[i].route.toString();
 
-      if (runDate == orderDate && customerRouteId == runRouteId) {
+      if (formattedRunDate == orderDate && customerRouteId == runRouteId) {
         let runId = comingRunsArray[i]._id.toString();
 
         const ourRun = await Run.findByIdAndUpdate(
@@ -187,7 +196,7 @@ exports.createOrder = async (req, res) => {
           ourRun,
         });
       } else {
-        createNewRun(orderDate, newOrder, customerRouteId);
+        return createNewRun(orderDate, newOrder, customerRouteId);
       }
     }
   } catch (err) {
@@ -254,6 +263,7 @@ exports.getOrder = async (req, res) => {
 exports.getAllOrders = async (req, res) => {
   try {
     const orders = await Order.find()
+      .sort({ date: -1 })
       .populate("customer")
       .populate({
         path: "products",
