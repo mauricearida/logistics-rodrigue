@@ -55,11 +55,6 @@ exports.validateCreateCustomer = [
     .isEmpty()
     .withMessage("Please provide at least one address"),
   check("suburb").trim().not().isEmpty().withMessage("Suburb Name is missing"),
-  check("ispricingdefault")
-    .trim()
-    .not()
-    .isEmpty()
-    .withMessage("Is pricing default is required"),
   check("email").isEmail().withMessage("Email is Invalid"),
   check("customername")
     .trim()
@@ -76,11 +71,6 @@ exports.validateCreateCustomer = [
     .not()
     .isEmpty()
     .withMessage("Deliveryoccur is required"),
-  check("paymentmethod")
-    .trim()
-    .not()
-    .isEmpty()
-    .withMessage("Paymentmethod is required"),
   check("isconsolidatedbiller")
     .trim()
     .not()

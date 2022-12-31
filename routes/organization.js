@@ -10,8 +10,6 @@ const {
 const { validateMongoId, validate } = require("../middlewares/validators");
 const { verifyTokenAndAdmin } = require("../middlewares/verifyToken");
 
-//==============================
-
 router
   .route("/")
   .post(verifyTokenAndAdmin, createOrganization)

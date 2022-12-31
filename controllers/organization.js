@@ -1,9 +1,10 @@
 const Organization = require("../models/Organization");
+const Customer = require("../models/Customer");
 const { log } = require("../helpers/Loger");
 
 exports.createOrganization = async (req, res) => {
   try {
-    const { name, customers } = req.body;
+    const { name } = req.body;
     const newOrganization = new Organization(req.body);
 
     const isNewOrganizationName =
@@ -26,17 +27,25 @@ exports.createOrganization = async (req, res) => {
 
 exports.updateOrganization = async (req, res) => {
   try {
-    const { name } = req.body;
-    if (name) {
-      const isNewBusinessName = await Organization.isThisOrganizationNameInUse(
-        name
-      );
-      if (!isNewBusinessName)
-        return res.status(400).json({
-          success: false,
-          message: "This organization name is already is use",
-        });
+    console.clear();
+    const { name, customers } = req.body;
+    if (customers.length) {
+      for (let i = 0; i < customers.length; i++) {
+        const customer = await Customer.findById(customers[i].customer);
+        if (!customer)
+          return res.status(404).json({
+            success: false,
+            message: `No customer was found by the id of ${customers.customer[i]}`,
+          });
+        if (customer.organization) {
+          return res.status(401).json({
+            success: false,
+            message: `Customer by the id of ${customers.customer[i]} already has a an organization`,
+          });
+        }
+      }
     }
+
     const updatedOrganization = await Organization.findByIdAndUpdate(
       req.params.id,
       {
@@ -50,6 +59,7 @@ exports.updateOrganization = async (req, res) => {
       res.status(404).json("No organization was found with this id !");
     }
   } catch (err) {
+    console.log("updateOrganization err", err);
     await log(err);
     res.status(500).json(err);
   }
@@ -57,9 +67,25 @@ exports.updateOrganization = async (req, res) => {
 
 exports.deleteOrganization = async (req, res) => {
   try {
+    const organization = await Organization.findById(req.params.id);
+    if (!organization) {
+      return res.status(404).json({
+        success: false,
+        message: "NO organization found by this id",
+      });
+    }
+    if (organization.customers.length) {
+      return res.status(401).json({
+        success: false,
+        message:
+          "Organization already has customers in it, remove them if you want to delete it",
+      });
+    }
+
     await Organization.findByIdAndDelete(req.params.id);
     res.status(200).json("Organization has been deleted...");
   } catch (err) {
+    console.log("deleteOrganization err", err);
     await log(err);
     res.status(500).json(err);
   }
@@ -67,7 +93,9 @@ exports.deleteOrganization = async (req, res) => {
 
 exports.getOrganization = async (req, res) => {
   try {
-    const organization = await Organization.findById(req.params.id);
+    const organization = await Organization.findById(req.params.id).populate(
+      "customers"
+    );
     if (organization) {
       res.status(200).json(organization);
     } else {
@@ -81,7 +109,9 @@ exports.getOrganization = async (req, res) => {
 
 exports.getAllOrganizations = async (req, res) => {
   try {
-    const organizations = await Organization.find().sort({ _id: -1 });
+    const organizations = await Organization.find()
+      .sort({ _id: -1 })
+      .populate("customers");
     const organizationCount = await Organization.countDocuments();
     let objectTosend = {
       organizationCount,

@@ -75,6 +75,10 @@ exports.createproduct = async (req, res) => {
         let savedProduct = await newProduct.save();
 
         res.status(200).json(savedProduct);
+
+        await Sharedrecords.findByIdAndUpdate("63663fa59b531a420083d78f", {
+          $inc: { productcodeid: 1 },
+        });
       }
     } catch (err) {
       console.log(err);

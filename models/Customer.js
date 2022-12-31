@@ -8,7 +8,6 @@ const CustomerSchema = new mongoose.Schema(
     isarchived: { type: Boolean, default: false },
     suburb: { type: String, required: true },
     notes: { type: String },
-    ispricingdefault: { type: Boolean, required: true, default: true },
     customername: { type: String, required: true },
     email: { type: String },
     abn: { type: String },
@@ -34,16 +33,14 @@ const CustomerSchema = new mongoose.Schema(
     paymentmethod: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Paymentmethod",
-      required: true,
     },
     routeId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Route",
     },
-    isconsolidatedbiller: { type: Boolean, required: true },
-    billerforcustomer: {
+    organization: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Biller",
+      ref: "Organization",
     },
     promotions: [
       {
