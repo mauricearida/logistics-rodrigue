@@ -72,3 +72,25 @@ exports.getAllUsers = async (req, res) => {
     res.status(500).json(err);
   }
 };
+
+exports.findUsersByTextSearch = async (req, res) => {
+  const { find, page, limit } = req.query;
+  try {
+    const found = await User.find({
+      $or: [
+        { name: { $regex: find, $options: "i" } },
+        { phonenumber: { $regex: find, $options: "i" } },
+        { email: { $regex: find, $options: "i" } },
+      ],
+    })
+      .limit(limit * 1)
+      .skip((page - 1) * limit);
+
+    if (!found) return res.status(404).json("No Users were found");
+    return res.status(200).json(found);
+  } catch (err) {
+    console.log("err", err);
+    await log(err);
+    res.status(500).json(err);
+  }
+};

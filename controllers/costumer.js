@@ -128,7 +128,8 @@ exports.getCostumerPaginatedArchived = async (req, res) => {
   }
 };
 exports.findCustomerByTextSearch = async (req, res) => {
-  const { find } = req.query;
+  const { find, page, limit } = req.query;
+
   try {
     const found = await Customer.find({
       $or: [
@@ -136,7 +137,9 @@ exports.findCustomerByTextSearch = async (req, res) => {
         { businessname: { $regex: find, $options: "i" } },
         { customername: { $regex: find, $options: "i" } },
       ],
-    });
+    })
+      .limit(limit * 1)
+      .skip((page - 1) * limit);
 
     if (!found) return res.status(404).json("no customer was found");
     return res.status(200).json(found);

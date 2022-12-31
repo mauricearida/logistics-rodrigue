@@ -158,7 +158,7 @@ exports.getproductsPaginated = async (req, res) => {
 };
 
 exports.findProductsByTextSearch = async (req, res) => {
-  const { find } = req.query;
+  const { find, page, limit } = req.query;
   try {
     const found = await Products.find({
       $or: [
@@ -166,7 +166,9 @@ exports.findProductsByTextSearch = async (req, res) => {
         { assignedCode: { $regex: find, $options: "i" } },
         { categoryId: { $regex: find, $options: "i" } },
       ],
-    });
+    })
+      .limit(limit * 1)
+      .skip((page - 1) * limit);
 
     if (!found) return res.status(404).json("No Products were found");
     return res.status(200).json(found);

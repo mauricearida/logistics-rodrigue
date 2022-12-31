@@ -4,6 +4,7 @@ const {
   updateUser,
   getAllUsers,
   deteleUser,
+  findUsersByTextSearch,
 } = require("../controllers/users");
 const { validateMongoId, validate } = require("../middlewares/validators");
 const {
@@ -19,6 +20,6 @@ router
   .put(verifyTokenAndAuthorization, validateMongoId, validate, updateUser)
   .delete(verifyTokenAndAdmin, validateMongoId, validate, deteleUser);
 
-router.route("/").get(verifyTokenAndAdmin, getAllUsers);
+router.route("/find").post(verifyTokenAndAdmin, findUsersByTextSearch);
 
 module.exports = router;

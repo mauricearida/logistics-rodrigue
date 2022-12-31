@@ -261,9 +261,12 @@ exports.getOrder = async (req, res) => {
 };
 
 exports.getAllOrders = async (req, res) => {
+  const { limit, page, done } = req.query;
+
   try {
-    const orders = await Order.find()
-      .sort({ date: -1 })
+    const orders = await Order.find(
+      done ? { $or: [{ status: 1 }, { status: 2 }] } : null
+    )
       .populate("customer")
       .populate({
         path: "products",
@@ -272,7 +275,10 @@ exports.getAllOrders = async (req, res) => {
           model: "Product",
         },
       })
-      .exec();
+      .sort({ date: -1 })
+      .limit(limit * 1)
+      .skip((page - 1) * limit);
+
     const orderCount = await Order.countDocuments();
     let objectTosend = {
       orderCount,
