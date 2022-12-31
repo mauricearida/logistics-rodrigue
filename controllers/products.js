@@ -30,7 +30,7 @@ exports.createproduct = async (req, res) => {
     unitesperbox,
     prioritynumber,
     price,
-    assignedcode,
+    assignedCode,
   } = req.body;
 
   if (
@@ -39,13 +39,15 @@ exports.createproduct = async (req, res) => {
     !unitesperbox ||
     !prioritynumber ||
     !price ||
-    !assignedcode
+    !assignedCode
   ) {
     return res.status(400).json("Please fill in all the fields");
   } else {
     const newProduct = new Products(req.body);
 
-    const isNewProductCode = await Products.isThisCodeInUse(assignedcode);
+    console.log("req.body", req.body);
+
+    const isNewProductCode = await Products.isThisCodeInUse(assignedCode);
     if (!isNewProductCode)
       return res.status(400).json({
         success: false,
