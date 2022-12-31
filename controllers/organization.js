@@ -25,27 +25,45 @@ exports.createOrganization = async (req, res) => {
   }
 };
 
-exports.updateOrganization = async (req, res) => {
+exports.addCustomerToOrganization = async (req, res) => {
   try {
     console.clear();
-    const { name, customers } = req.body;
-    if (customers.length) {
-      for (let i = 0; i < customers.length; i++) {
-        const customer = await Customer.findById(customers[i].customer);
-        if (!customer)
-          return res.status(404).json({
-            success: false,
-            message: `No customer was found by the id of ${customers.customer[i]}`,
-          });
-        if (customer.organization) {
-          return res.status(401).json({
-            success: false,
-            message: `Customer by the id of ${customers.customer[i]} already has a an organization`,
-          });
-        }
-      }
-    }
+    const { customerId } = req.body;
 
+    const customer = await Customer.findById(customerId);
+
+    if (!customer)
+      return res.status(404).json({
+        success: false,
+        message: `No customer was found by the id of ${customerId}`,
+      });
+    if (customer.organization) {
+      return res.status(401).json({
+        success: false,
+        message: `Customer by the id of ${customerId} already has a an organization`,
+      });
+    }
+    let customerToPush = { customer: customerId };
+    const organization = await Organization.findByIdAndUpdate(
+      req.params.id,
+      { $push: { customers: customerToPush } },
+      { new: true }
+    );
+    if (organization) {
+      return res.status(200).json({ success: true, organization });
+    } else {
+      return res.status(404).json({
+        success: false,
+        message: "no organization was found by this id",
+      });
+    }
+  } catch (err) {
+    console.log("addCustomerToOrganization err", err);
+  }
+};
+
+exports.updateOrganization = async (req, res) => {
+  try {
     const updatedOrganization = await Organization.findByIdAndUpdate(
       req.params.id,
       {

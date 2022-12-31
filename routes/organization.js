@@ -5,6 +5,7 @@ const {
   deleteOrganization,
   getOrganization,
   getAllOrganizations,
+  addCustomerToOrganization,
 } = require("../controllers/organization");
 
 const { validateMongoId, validate } = require("../middlewares/validators");
@@ -17,8 +18,23 @@ router
 
 router
   .route("/:id")
+  .post(
+    verifyTokenAndAdmin,
+    validateMongoId,
+    validate,
+    addCustomerToOrganization
+  )
   .delete(verifyTokenAndAdmin, validateMongoId, validate, deleteOrganization)
   .put(verifyTokenAndAdmin, validateMongoId, validate, updateOrganization)
   .get(validateMongoId, getOrganization);
+
+router
+  .route("/addcustomer/:id")
+  .post(
+    verifyTokenAndAdmin,
+    validateMongoId,
+    validate,
+    addCustomerToOrganization
+  );
 
 module.exports = router;

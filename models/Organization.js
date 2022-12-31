@@ -5,7 +5,7 @@ const OrganizationSchema = new mongoose.Schema(
     name: { type: String },
     customers: [
       {
-        customer: {
+        customerId: {
           type: mongoose.Schema.Types.ObjectId,
           ref: "Customer",
         },
