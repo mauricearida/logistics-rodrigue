@@ -40,7 +40,7 @@ exports.sendCustomeIdToCreateOrder = async (req, res) => {
     }
 
     if (!customer.promotions.length) {
-      const products = await Products.find({ isarchived: isarchived })
+      const products = await Products.find({ visibility: true })
         .limit(limit * 1)
         .skip((page - 1) * limit);
 
@@ -79,7 +79,7 @@ exports.sendCustomeIdToCreateOrder = async (req, res) => {
       }
     }
 
-    const products = await Products.find({ isarchived: isarchived })
+    const products = await Products.find({ visibility: true })
       .limit(limit * 1)
       .skip((page - 1) * limit);
 
