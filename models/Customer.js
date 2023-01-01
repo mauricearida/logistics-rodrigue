@@ -30,6 +30,7 @@ const CustomerSchema = new mongoose.Schema(
         to: { type: Date },
       },
     ],
+    totalOrders: { type: Number },
     paymentmethod: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Paymentmethod",

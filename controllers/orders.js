@@ -139,7 +139,6 @@ exports.sendCustomeIdToCreateOrder = async (req, res) => {
     res.status(500).json(err);
   }
 };
-
 exports.createOrder = async (req, res) => {
   console.clear();
   const createNewRun = async (orderDate, newOrder, customerRouteId) => {
@@ -158,7 +157,7 @@ exports.createOrder = async (req, res) => {
     for (let j = 0; j < products.length; j++) {
       let quantity = products[j].quantity;
       let pricePerUnit = products[j].pricePerUnit;
-      amount = amount + quantity * pricePerUnit;
+      amount = quantity * pricePerUnit + amount;
     }
     newOrder.totalamount = amount;
     await newOrder.save();
@@ -199,13 +198,21 @@ exports.createOrder = async (req, res) => {
         return createNewRun(orderDate, newOrder, customerRouteId);
       }
     }
+
+    const updatedCustomer = await Customer.findByIdAndUpdate(
+      customer,
+      {
+        $inc: { totalOrders: 1 },
+      },
+      { new: true }
+    );
+    if (!updatedCustomer) await log("totalOrder could not be updated");
   } catch (err) {
     console.log("createOrder err", err);
     await log(err);
     res.status(500).json(err);
   }
 };
-
 exports.updateOrder = async (req, res) => {
   try {
     const updatedOrder = await Order.findByIdAndUpdate(
@@ -225,7 +232,6 @@ exports.updateOrder = async (req, res) => {
     res.status(500).json(err);
   }
 };
-
 exports.deleteOrder = async (req, res) => {
   try {
     await Order.findByIdAndDelete(req.params.id);
@@ -235,7 +241,6 @@ exports.deleteOrder = async (req, res) => {
     res.status(500).json(err);
   }
 };
-
 exports.getOrder = async (req, res) => {
   try {
     const order = await Order.findById(req.params.id)
@@ -259,7 +264,6 @@ exports.getOrder = async (req, res) => {
     res.status(500).json(err);
   }
 };
-
 exports.getAllOrders = async (req, res) => {
   const { limit, page, done } = req.query;
 
