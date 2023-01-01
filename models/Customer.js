@@ -30,7 +30,7 @@ const CustomerSchema = new mongoose.Schema(
         to: { type: Date },
       },
     ],
-    totalOrders: { type: Number },
+    totalOrders: { type: Number, default: 0 },
     paymentmethod: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Paymentmethod",
