@@ -19,9 +19,9 @@ const Promotion = require("../models/Promotion");
 exports.sendCustomeIdToCreateOrder = async (req, res) => {
   try {
     console.clear();
-    const { page, limit, isarchived } = req.query;
+    const { page } = req.query;
 
-    if (!page || !limit || !isarchived)
+    if (!page)
       return res
         .status(400)
         .json(
@@ -38,7 +38,7 @@ exports.sendCustomeIdToCreateOrder = async (req, res) => {
         .status(404)
         .json({ success: false, message: "No customer is found by this Id!" });
     }
-
+    const limit = 30;
     if (!customer.promotions.length) {
       const products = await Products.find({ visibility: true })
         .limit(limit * 1)
