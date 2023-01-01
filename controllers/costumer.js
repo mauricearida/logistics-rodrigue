@@ -76,10 +76,10 @@ exports.deleteCostumer = async (req, res) => {
 };
 exports.getCostumer = async (req, res) => {
   try {
-    const customer = await Customer.findById(req.params.id).populate([
-      "paymentmethod",
+    const customer = await Customer.findById(req.params.id).populate(
       "promotions",
-    ]);
+      { name: 1, _id: 1 }
+    );
     if (customer) {
       res.status(200).json(customer);
     } else {
