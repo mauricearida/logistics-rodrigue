@@ -13,3 +13,4 @@ exports.costumerRoute = require("./costumer");
 exports.vehiclesRoute = require("./vehicle");
 exports.peopleRoute = require("./people");
 exports.organizationRoute = require("./organization");
+exports.statisticsRoute = require("./statistics");

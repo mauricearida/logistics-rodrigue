@@ -8,14 +8,6 @@ const Customer = require("../models/Customer");
 const Products = require("../models/Products");
 const Promotion = require("../models/Promotion");
 
-// product in the category : 63add3962559a78369d50f38
-// categoryId of the product : 637d106099d3a83673e6a476
-
-// promotion for product : 63adf32dfcaec9073efed377
-// promotion for category : 63adf3abfcaec9073efed381
-
-// customer id : 63adf422fcaec9073efed387
-
 exports.sendCustomeIdToCreateOrder = async (req, res) => {
   try {
     console.clear();
@@ -151,6 +143,7 @@ exports.createOrder = async (req, res) => {
     return res.status(200).json({ message: "New run is created", savedRun });
   };
   const { date, customer, products } = req.body;
+
   try {
     const newOrder = new Order(req.body);
     let amount = 0;
@@ -159,9 +152,10 @@ exports.createOrder = async (req, res) => {
       let pricePerUnit = products[j].pricePerUnit;
       amount = quantity * pricePerUnit + amount;
     }
-    newOrder.totalamount = amount;
-    await newOrder.save();
     let ourCustomer = await getCostumerInternally(customer);
+    newOrder.totalamount = amount + ourCustomer.deliveryfee;
+    newOrder.initiateduser = req.user.id.toString();
+    await newOrder.save();
 
     if (!ourCustomer)
       return res
