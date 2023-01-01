@@ -168,6 +168,12 @@ exports.getPromotion = async (req, res) => {
           path: "productId",
         },
       })
+      .populate({
+        path: "categorypromotion",
+        populate: {
+          path: "categoryId",
+        },
+      })
       .exec();
 
     if (promotion) {
