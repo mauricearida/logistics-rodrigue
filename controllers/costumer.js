@@ -46,7 +46,6 @@ exports.createCostumer = async (req, res) => {
     res.status(500).json(err);
   }
 };
-
 exports.updateCostumer = async (req, res) => {
   try {
     const updatedCustomer = await Customer.findByIdAndUpdate(
@@ -66,7 +65,6 @@ exports.updateCostumer = async (req, res) => {
     res.status(500).json(err);
   }
 };
-
 exports.deleteCostumer = async (req, res) => {
   try {
     const customer = await Customer.findByIdAndDelete(req.params.id);
@@ -76,12 +74,12 @@ exports.deleteCostumer = async (req, res) => {
     res.status(500).json(err);
   }
 };
-
 exports.getCostumer = async (req, res) => {
   try {
-    const customer = await Customer.findById(req.params.id).populate(
-      "paymentmethod"
-    );
+    const customer = await Customer.findById(req.params.id).populate([
+      "paymentmethod",
+      "promotions",
+    ]);
     if (customer) {
       res.status(200).json(customer);
     } else {
