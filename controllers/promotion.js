@@ -161,13 +161,22 @@ exports.deletePromotion = async (req, res) => {
 
 exports.getPromotion = async (req, res) => {
   try {
-    const promotion = await Promotion.findById(req.params.id);
+    const promotion = await Promotion.findById(req.params.id)
+      .populate({
+        path: "productspromotion",
+        populate: {
+          path: "productId",
+        },
+      })
+      .exec();
+
     if (promotion) {
       res.status(200).json(promotion);
     } else {
       res.status(404).json("No promotion was found with this id !");
     }
   } catch (err) {
+    console.log("getPromotion err", err);
     await log(err);
     res.status(500).json(err);
   }
