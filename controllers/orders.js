@@ -242,7 +242,7 @@ exports.updateOrder = async (req, res) => {
         $set: req.body,
       },
       { new: true }
-    );
+    ).populate("customer");
     if (updatedOrder) {
       res.status(200).json(updatedOrder);
     } else {
