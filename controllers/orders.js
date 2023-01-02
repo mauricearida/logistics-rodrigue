@@ -114,14 +114,14 @@ exports.sendCustomeIdToCreateOrder = async (req, res) => {
           (prod) =>
             prod.productspromotion[0].productId.toString() ===
             product._id.toString()
-        )[0].productspromotion[0].newprice;
+        )[0]?.productspromotion[0]?.newprice;
 
         product.promotionPrice = newPrice;
       }
     });
 
     return res.status(200).json({
-      succes: true,
+      success: true,
       message:
         "The products' new prices are computated as for the customer's promotions",
       data: products,

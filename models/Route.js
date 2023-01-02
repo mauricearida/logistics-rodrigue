@@ -4,6 +4,8 @@ const RouteSchema = new mongoose.Schema(
   {
     name: { type: String },
     description: { type: String },
+    from: { type: String },
+    to: { type: String },
     places: [{ type: String }],
     note: { type: String },
   },
