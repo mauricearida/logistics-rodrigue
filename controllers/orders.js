@@ -287,22 +287,51 @@ exports.getOrder = async (req, res) => {
 };
 exports.getAllOrders = async (req, res) => {
   const { limit, page, done } = req.query;
-
+  //all 0 1 2 3
+  // done = true => 2
+  // done = false => 0 1 2 3
   try {
-    const orders = await Order.find(
-      done ? { $or: [{ status: 1 }, { status: 2 }] } : null
-    )
-      .populate("customer")
-      .populate({
-        path: "products",
-        populate: {
-          path: "product",
-          model: "Product",
-        },
-      })
-      .sort({ date: -1 })
-      .limit(limit * 1)
-      .skip((page - 1) * limit);
+    const orders =
+      done === "all"
+        ? await Order.find()
+            .populate("customer")
+            .populate({
+              path: "products",
+              populate: {
+                path: "product",
+                model: "Product",
+              },
+            })
+            .sort({ date: -1 })
+            .limit(limit * 1)
+            .skip((page - 1) * limit)
+        : done === "false"
+        ? await Order.find({
+            $or: [{ status: 0 }, { status: 1 }, { status: 3 }],
+          })
+            .populate("customer")
+            .populate({
+              path: "products",
+              populate: {
+                path: "product",
+                model: "Product",
+              },
+            })
+            .sort({ date: -1 })
+            .limit(limit * 1)
+            .skip((page - 1) * limit)
+        : await Order.find({ status: 2 })
+            .populate("customer")
+            .populate({
+              path: "products",
+              populate: {
+                path: "product",
+                model: "Product",
+              },
+            })
+            .sort({ date: -1 })
+            .limit(limit * 1)
+            .skip((page - 1) * limit);
 
     const orderCount = await Order.countDocuments();
     let objectTosend = {
@@ -318,5 +347,18 @@ exports.getAllOrders = async (req, res) => {
     console.log("err", err);
     await log(err);
     res.status(500).json(err);
+  }
+};
+
+// product name
+// product assigned code
+// csutomer name
+// customer businessname
+// date
+
+exports.searchOrderByProduct = async (req, res) => {
+  try {
+  } catch (err) {
+    console.log("searchOrderByProduct err", err);
   }
 };
