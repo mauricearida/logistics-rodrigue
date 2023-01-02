@@ -58,10 +58,14 @@ exports.sendCustomeIdToCreateOrder = async (req, res) => {
       let fromDate = new Date(promotion.from);
       let toDate = new Date(promotion.to);
 
+      const products = await Products.find({ visibility: true })
+        .limit(limit * 1)
+        .skip((page - 1) * limit);
+
       if (fromDate > now || toDate < now) {
         return res.status(403).json({
-          success: false,
-          message: `The promotion with id ${promotionsArray[i]} has an expired or date to come`,
+          success: true,
+          products,
         });
       }
 
@@ -71,10 +75,6 @@ exports.sendCustomeIdToCreateOrder = async (req, res) => {
         customerproductpromotions.push(promotion);
       }
     }
-
-    const products = await Products.find({ visibility: true })
-      .limit(limit * 1)
-      .skip((page - 1) * limit);
 
     let customerCategoryPromotionsIds = [];
     let customerProductsPromotionsIds = [];
