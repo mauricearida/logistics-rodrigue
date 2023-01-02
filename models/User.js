@@ -9,6 +9,7 @@ const UserSchema = new mongoose.Schema(
     phonenumber: { type: String, required: true, unique: true },
     lastlogin: { type: Date, default: null },
     role: { type: Number, default: 0 },
+    ordersCount: { type: Number, default: 0 },
     theme: { type: Number, default: 0 },
 
     // 0 = user

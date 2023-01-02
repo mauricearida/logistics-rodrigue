@@ -190,7 +190,21 @@ exports.getPromotion = async (req, res) => {
 
 exports.getAllPromotions = async (req, res) => {
   try {
-    const promotions = await Promotion.find().sort({ _id: -1 });
+    const promotions = await Promotion.find()
+      .sort({ _id: -1 })
+      .populate({
+        path: "productspromotion",
+        populate: {
+          path: "productId",
+        },
+      })
+      .populate({
+        path: "categorypromotion",
+        populate: {
+          path: "categoryId",
+        },
+      })
+      .exec();
     const promotionCount = await Promotion.countDocuments();
 
     let objectTosend = {

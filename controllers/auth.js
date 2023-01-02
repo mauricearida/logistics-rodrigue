@@ -25,7 +25,6 @@ exports.signup = async (req, res) => {
 
   //check if phone number is duplicate
   const isNewPhoneNumber = await User.isThisPhoneInUse(phonenumber);
-  console.log("isNewPhoneNumber", isNewPhoneNumber);
 
   if (isNewPhoneNumber) {
     return res.status(400).json({

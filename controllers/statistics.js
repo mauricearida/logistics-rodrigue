@@ -1,4 +1,5 @@
 const Order = require("../models/Orders");
+const User = require("../models/User");
 const Run = require("../models/Run");
 const { log } = require("../helpers/Loger");
 const dayjs = require("dayjs");
@@ -97,5 +98,35 @@ exports.getSalesMonth = async (req, res) => {
     console.log("getSalesByDay err", err);
     await log(err);
     res.status(500).json(err);
+  }
+};
+
+exports.getSalesPerUser = async (req, res) => {
+  console.clear();
+  // const { doneones } = req.query;
+  try {
+    //  const orders = await Order.find({ status: 2 });
+
+    const users = await User.find();
+    const orders = await Order.find();
+    let usersArray = [];
+    let ordersArray = [];
+
+    for (let i = 0; i < users.length; i++) {
+      const data = await Order.aggregate([
+        {
+          $match: {
+            $and: [{ initiateduser: users[i]._id }, { status: 2 }],
+          },
+        },
+      ]);
+      if (data) {
+        console.log(`data ${users[i]._id}`, data);
+      }
+    }
+
+    //   console.log("usersArray", usersArray);
+  } catch (err) {
+    console.log("err", err);
   }
 };

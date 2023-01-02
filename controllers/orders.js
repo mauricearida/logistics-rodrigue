@@ -1,4 +1,5 @@
 const Order = require("../models/Orders");
+const User = require("../models/User");
 const Run = require("../models/Run");
 const { log } = require("../helpers/Loger");
 const moment = require("moment");
@@ -142,6 +143,26 @@ exports.createOrder = async (req, res) => {
     const savedRun = await newRun.save();
     return res.status(200).json({ message: "New run is created", savedRun });
   };
+
+  const updateCustomerOrdeCount = async (customer) => {
+    await Customer.findByIdAndUpdate(
+      customer,
+      {
+        $inc: { totalOrders: 1 },
+      },
+      { new: true }
+    );
+  };
+
+  const updateUserOrdeCount = async (user) => {
+    await User.findByIdAndUpdate(
+      user,
+      {
+        $inc: { ordersCount: 1 },
+      },
+      { new: true }
+    );
+  };
   const { date, customer, products } = req.body;
 
   try {
@@ -168,7 +189,9 @@ exports.createOrder = async (req, res) => {
     let orderDate = moment(date).format("L");
 
     if (!comingRunsArray.length) {
-      return createNewRun(orderDate, newOrder, customerRouteId);
+      updateCustomerOrdeCount(customer);
+      updateUserOrdeCount(req.user.id.toString());
+      createNewRun(orderDate, newOrder, customerRouteId);
     }
 
     for (let i = 0; i < comingRunsArray.length; i++) {
@@ -184,11 +207,15 @@ exports.createOrder = async (req, res) => {
           { $push: { orders: newOrder } },
           { new: true }
         );
+        updateCustomerOrdeCount(customer);
+        updateUserOrdeCount(req.user.id.toString());
         return res.status(200).json({
           message: "Order is added to already created run at that date",
           ourRun,
         });
       } else {
+        updateCustomerOrdeCount(customer);
+        updateUserOrdeCount(req.user.id.toString());
         return createNewRun(orderDate, newOrder, customerRouteId);
       }
     }
