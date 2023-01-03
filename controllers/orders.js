@@ -13,6 +13,7 @@ exports.sendCustomeIdToCreateOrder = async (req, res) => {
   try {
     console.clear();
     const { page } = req.query;
+    const limit = 30;
 
     if (!page)
       return res
@@ -31,7 +32,6 @@ exports.sendCustomeIdToCreateOrder = async (req, res) => {
         .status(404)
         .json({ success: false, message: "No customer is found by this Id!" });
     }
-    const limit = 30;
     if (!customer.promotions.length) {
       const products = await Products.find({ visibility: true })
         .limit(limit * 1)
@@ -43,6 +43,9 @@ exports.sendCustomeIdToCreateOrder = async (req, res) => {
         data: products,
       });
     }
+    const products = await Products.find({ visibility: true })
+      .limit(limit * 1)
+      .skip((page - 1) * limit);
 
     let promotionsArray = customer.promotions;
     for (let i = 0; i < promotionsArray.length; i++) {
@@ -58,15 +61,8 @@ exports.sendCustomeIdToCreateOrder = async (req, res) => {
       let fromDate = new Date(promotion.from);
       let toDate = new Date(promotion.to);
 
-      const products = await Products.find({ visibility: true })
-        .limit(limit * 1)
-        .skip((page - 1) * limit);
-
       if (fromDate > now || toDate < now) {
-        return res.status(403).json({
-          success: true,
-          products,
-        });
+        continue;
       }
 
       if (!(JSON.stringify(promotion.categorypromotion) == "{}")) {
@@ -242,13 +238,23 @@ exports.updateOrder = async (req, res) => {
         $set: req.body,
       },
       { new: true }
-    ).populate("customer");
+    )
+      .populate("customer")
+      .populate({
+        path: "products",
+        populate: {
+          path: "name",
+          model: "Product",
+        },
+      });
+
     if (updatedOrder) {
       res.status(200).json(updatedOrder);
     } else {
       res.status(404).json("No order was found with this id !");
     }
   } catch (err) {
+    console.log("updateOrder err", err);
     await log(err);
     res.status(500).json(err);
   }
