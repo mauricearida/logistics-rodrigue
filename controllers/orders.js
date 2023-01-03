@@ -24,38 +24,39 @@ exports.sendCustomeIdToCreateOrder = async (req, res) => {
 
     //===================
     const customer = await Customer.findById(req.params.id);
-    let customerproductpromotions = [];
-    let customercategorypromotions = [];
 
     if (!customer) {
       return res
         .status(404)
         .json({ success: false, message: "No customer is found by this Id!" });
     }
-    if (!customer.promotions.length) {
-      const products = await Products.find({ visibility: true })
-        .limit(limit * 1)
-        .skip((page - 1) * limit);
+    const products = await Products.find({ visibility: true })
+      .limit(limit * 1)
+      .skip((page - 1) * limit);
 
+    if (!products) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Could not fetch products" });
+    }
+    if (!customer.promotions.length) {
       return res.status(200).json({
         success: true,
         message: "The customer doesn't have any promotions",
         data: products,
       });
     }
-    const products = await Products.find({ visibility: true })
-      .limit(limit * 1)
-      .skip((page - 1) * limit);
+
+    let customerproductpromotions = [];
+    let customercategorypromotions = [];
 
     let promotionsArray = customer.promotions;
     for (let i = 0; i < promotionsArray.length; i++) {
       const promotion = await Promotion.findById(promotionsArray[i].toString());
 
-      if (!promotion)
-        return res.status(404).json({
-          success: false,
-          message: `the promotion with id ${promotionsArray[i]} is not valid`,
-        });
+      if (!promotion) {
+        continue;
+      }
 
       let now = new Date();
       let fromDate = new Date(promotion.from);
