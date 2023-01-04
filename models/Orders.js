@@ -32,6 +32,14 @@ const OrderSchema = new mongoose.Schema(
     date: { type: Date },
     notes: { type: String },
     status: { type: Number, default: 0 },
+    automaticallyGenerated: {
+      type: Boolean,
+      default: false
+    },
+    deliveryOccured: {
+      type: Boolean,
+      default: false
+    },
   },
   { timestamps: true }
 );
