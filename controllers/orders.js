@@ -2,12 +2,13 @@ const Order = require("../models/Orders");
 const User = require("../models/User");
 const Run = require("../models/Run");
 const { log } = require("../helpers/Loger");
-const moment = require("moment");
 const { getComingRuns } = require("./runs");
 const { getCostumerInternally } = require("./costumer");
 const Customer = require("../models/Customer");
 const Products = require("../models/Products");
 const Promotion = require("../models/Promotion");
+const dayjs = require("dayjs");
+const moment = require("moment");
 
 exports.sendCustomeIdToCreateOrder = async (req, res) => {
   try {
@@ -363,9 +364,97 @@ exports.getAllOrders = async (req, res) => {
 // customer businessname
 // date
 
-exports.searchOrderByProduct = async (req, res) => {
+exports.searchOrderByProductText = async (req, res) => {
+  const { name } = req.query;
   try {
+    // const products = await Products.find({
+    //   $or: [
+    //     { name: { $regex: name, $options: "i" } },
+    //     {
+    //       assignedCode: { $regex: name, $options: "i" },
+    //     },
+    //   ],
+    // });
+    //===============================
+    // const orders = await Order.aggregate([
+    //   {
+    //     $lookup: {
+    //       from: "Product",
+    //       localField: "_id",
+    //       foreignField: "product",
+    //       as: "product",
+    //     },
+    //     $match:{
+    //       $or:[
+    //         {
+    //           'product'
+    //         }
+    //       ]
+    //     }
+    //   },
+    // ]);
+    //========================
+    // const order = await Order.find({
+    //   products: { product: { name: { $regex: name, $options: "i" } } },
+    // });
+    console.log("orders", orders);
   } catch (err) {
-    console.log("searchOrderByProduct err", err);
+    console.log("searchOrderByProductText err", err);
   }
 };
+
+//
+exports.executeDeliveryOccur = async (req, res) => {
+  console.clear();
+  try {
+    const today = new Date();
+    const myToday = new Date(today);
+    let twoWeeksAgo = dayjs(myToday).subtract(14, "days");
+    let oneWeekAgo = dayjs(myToday).subtract(7, "days");
+    // const oneWeekLastDate = new Date(oneWeekAgo);
+    const oneWeekLastDate = moment(new Date(oneWeekAgo));
+    const startOfDay = oneWeekLastDate.startOf("day").toISOString();
+    const endOfDay = oneWeekLastDate.endOf("day").toISOString();
+    const twoWeeksLastDate = new Date(twoWeeksAgo);
+    // console.log("lastDate", lastDate);
+    //  { $gte: myYesterday, $lte: myDate }
+    const orders = await Order.aggregate([
+      // {
+      //   date: { $gte: startOfDay, $lte: endOfDay },
+      // },
+      {
+        $lookup: {
+          from: "Customer",
+          localField: "customer",
+          foreignField: "_id",
+          as: "customer",
+        },
+      },
+    ]);
+    console.log(orders, "ord");
+    // const orders = await Order.aggregate([
+    //   { $match: { date: { $gte: lastDate } } },
+    // ]);
+
+    // console.log("orders", orders);
+  } catch (err) {
+    console.log("err", err);
+  }
+};
+
+// 63a99a816eb39e4af4979102
+// 63a99a696eb39e4af49790f8
+// 63a99a796eb39e4af49790fd
+
+// cusotmers :
+// 63b525112bc60c984d0a74d5
+// 63b5253b2bc60c984d0a74df
+// 63b5254d2bc60c984d0a74e5
+
+//Customer : 1 weekly
+
+// order  1/1-2022 -> trigger
+// set (same order) 8/1-2023
+
+// customer : 2 weeks (delivery occur :2)
+// order

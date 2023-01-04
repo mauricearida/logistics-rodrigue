@@ -6,6 +6,8 @@ const {
   getOrder,
   getAllOrders,
   sendCustomeIdToCreateOrder,
+  searchOrderByProductText,
+  executeDeliveryOccur,
 } = require("../controllers/orders");
 const {
   validateMongoId,
@@ -22,6 +24,10 @@ router
   .route("/")
   .post(verifyTokenAndAdmin, creatingOrder, validate, createOrder)
   .get(verifyTokenAndAdmin, getAllOrders);
+
+router.route("/findbytext").post(verifyTokenAndAdmin, searchOrderByProductText);
+
+router.route("/deliveryoccur").post(verifyTokenAndAdmin, executeDeliveryOccur);
 
 router
   .route("/:id")

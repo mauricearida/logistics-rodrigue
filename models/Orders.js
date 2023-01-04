@@ -1,6 +1,10 @@
 const mongoose = require("mongoose");
 
 const OrderSchema = new mongoose.Schema(
+  // status 0: pending
+  // status 1: confimred
+  // status 2: done
+  // status 3: canceled
   {
     customer: {
       type: mongoose.Schema.Types.ObjectId,
@@ -25,7 +29,6 @@ const OrderSchema = new mongoose.Schema(
       },
     ],
     totalamount: { type: Number },
-    deliveriesoccur: { type: Number, required: true, default: 0 },
     date: { type: Date },
     notes: { type: String },
     status: { type: Number, default: 0 },

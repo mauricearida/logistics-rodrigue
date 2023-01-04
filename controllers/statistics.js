@@ -34,7 +34,10 @@ exports.getLastMonthSales = async (req, res) => {
     res.status(500).json(err);
   }
 };
-
+[
+  { x: "21.2.20220", y: 30 },
+  { x: "22.2.2022", y: 40 },
+];
 exports.getSalesByDay = async (req, res) => {
   console.clear();
   const { date } = req.query;

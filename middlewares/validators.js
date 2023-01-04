@@ -114,16 +114,6 @@ exports.creatingOrder = [
     .not()
     .isEmpty()
     .withMessage("Please insert at least one product"),
-  check("deliveriesoccur")
-    .trim()
-    .not()
-    .isEmpty()
-    .withMessage("Delivery Occur is missing"),
-  check("status")
-    .trim()
-    .not()
-    .isEmpty()
-    .withMessage("Delivery status is missing"),
 ];
 
 // Creating Biller
