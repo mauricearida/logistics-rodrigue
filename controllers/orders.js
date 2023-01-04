@@ -2,13 +2,14 @@ const Order = require("../models/Orders");
 const User = require("../models/User");
 const Run = require("../models/Run");
 const { log } = require("../helpers/Loger");
-const { getComingRuns } = require("./runs");
+const { getComingRuns, getAllComingRuns } = require("./runs");
 const { getCostumerInternally } = require("./costumer");
 const Customer = require("../models/Customer");
 const Products = require("../models/Products");
 const Promotion = require("../models/Promotion");
 const dayjs = require("dayjs");
 const moment = require("moment");
+const { default: mongoose } = require("mongoose");
 
 exports.sendCustomeIdToCreateOrder = async (req, res) => {
   try {
@@ -79,10 +80,10 @@ exports.sendCustomeIdToCreateOrder = async (req, res) => {
 
     customercategorypromotions.forEach(
       (cat) =>
-        (customerCategoryPromotionsIds = [
-          ...customerCategoryPromotionsIds,
-          cat.categorypromotion.categoryId.toString(),
-        ])
+      (customerCategoryPromotionsIds = [
+        ...customerCategoryPromotionsIds,
+        cat.categorypromotion.categoryId.toString(),
+      ])
     );
 
     customerproductpromotions.forEach((promotion) =>
@@ -139,7 +140,7 @@ exports.createOrder = async (req, res) => {
       route: customerRouteId,
     });
     const savedRun = await newRun.save();
-    return res.status(200).json({ message: "New run is created", savedRun });
+    return savedRun;
   };
 
   const updateCustomerOrdeCount = async (customer) => {
@@ -175,6 +176,8 @@ exports.createOrder = async (req, res) => {
     newOrder.totalamount = amount + ourCustomer.deliveryfee;
     newOrder.initiateduser = req.user.id.toString();
     await newOrder.save();
+    updateCustomerOrdeCount(customer);
+    updateUserOrdeCount(req.user.id.toString());
 
     if (!ourCustomer)
       return res
@@ -186,46 +189,28 @@ exports.createOrder = async (req, res) => {
     //wen badna nhetetla coda hayde ya Emile
     let orderDate = moment(date).format("L");
 
-    if (!comingRunsArray.length) {
-      updateCustomerOrdeCount(customer);
-      updateUserOrdeCount(req.user.id.toString());
-      createNewRun(orderDate, newOrder, customerRouteId);
+    const existComingRun = comingRunsArray.find((oneComingRun) => {
+      let formattedRunDate = moment(oneComingRun.date).format("L");
+      let runRouteId = oneComingRun.route.toString();
+      return (formattedRunDate == orderDate && runRouteId == customerRouteId)
+    })
+
+
+    if (existComingRun) {
+      let runId = existComingRun._id.toString();
+      const ourRun = await Run.findByIdAndUpdate(
+        runId,
+        { $push: { orders: newOrder } },
+        { new: true }
+      );
+      return res.status(200).json({
+        message: "Order is added to already created run at that date",
+        ourRun,
+      });
     }
+    const ourRun = await createNewRun(orderDate, newOrder, customerRouteId);
+    return res.status(200).json({ message: "New run is created", ourRun });
 
-    for (let i = 0; i < comingRunsArray.length; i++) {
-      let runDate = comingRunsArray[i].date;
-      let formattedRunDate = moment(runDate).format("L");
-      let runRouteId = comingRunsArray[i].route.toString();
-
-      if (formattedRunDate == orderDate && customerRouteId == runRouteId) {
-        let runId = comingRunsArray[i]._id.toString();
-
-        const ourRun = await Run.findByIdAndUpdate(
-          runId,
-          { $push: { orders: newOrder } },
-          { new: true }
-        );
-        updateCustomerOrdeCount(customer);
-        updateUserOrdeCount(req.user.id.toString());
-        return res.status(200).json({
-          message: "Order is added to already created run at that date",
-          ourRun,
-        });
-      } else {
-        updateCustomerOrdeCount(customer);
-        updateUserOrdeCount(req.user.id.toString());
-        return createNewRun(orderDate, newOrder, customerRouteId);
-      }
-    }
-
-    const updatedCustomer = await Customer.findByIdAndUpdate(
-      customer,
-      {
-        $inc: { totalOrders: 1 },
-      },
-      { new: true }
-    );
-    if (!updatedCustomer) await log("totalOrder could not be updated");
   } catch (err) {
     console.log("createOrder err", err);
     await log(err);
@@ -302,19 +287,19 @@ exports.getAllOrders = async (req, res) => {
     const orders =
       done === "all"
         ? await Order.find()
-            .populate("customer")
-            .populate({
-              path: "products",
-              populate: {
-                path: "product",
-                model: "Product",
-              },
-            })
-            .sort({ date: -1 })
-            .limit(limit * 1)
-            .skip((page - 1) * limit)
+          .populate("customer")
+          .populate({
+            path: "products",
+            populate: {
+              path: "product",
+              model: "Product",
+            },
+          })
+          .sort({ date: -1 })
+          .limit(limit * 1)
+          .skip((page - 1) * limit)
         : done === "false"
-        ? await Order.find({
+          ? await Order.find({
             $or: [{ status: 0 }, { status: 1 }, { status: 3 }],
           })
             .populate("customer")
@@ -328,7 +313,7 @@ exports.getAllOrders = async (req, res) => {
             .sort({ date: -1 })
             .limit(limit * 1)
             .skip((page - 1) * limit)
-        : await Order.find({ status: 2 })
+          : await Order.find({ status: 2 })
             .populate("customer")
             .populate({
               path: "products",
@@ -366,38 +351,46 @@ exports.getAllOrders = async (req, res) => {
 
 exports.searchOrderByProductText = async (req, res) => {
   const { name } = req.query;
+  const isDate = moment(name, "", true).isValid()
   try {
-    // const products = await Products.find({
-    //   $or: [
-    //     { name: { $regex: name, $options: "i" } },
-    //     {
-    //       assignedCode: { $regex: name, $options: "i" },
-    //     },
-    //   ],
-    // });
-    //===============================
-    // const orders = await Order.aggregate([
-    //   {
-    //     $lookup: {
-    //       from: "Product",
-    //       localField: "_id",
-    //       foreignField: "product",
-    //       as: "product",
-    //     },
-    //     $match:{
-    //       $or:[
-    //         {
-    //           'product'
-    //         }
-    //       ]
-    //     }
-    //   },
-    // ]);
-    //========================
-    // const order = await Order.find({
-    //   products: { product: { name: { $regex: name, $options: "i" } } },
-    // });
-    console.log("orders", orders);
+    let findQuery = {};
+    if (!isDate) {
+      const productsIDSQuery = Products.find({
+        $or: [
+          { name: { $regex: name, $options: "i" } },
+          {
+            assignedCode: { $regex: name, $options: "i" },
+          },
+        ],
+      }).select('_id')
+      const customersIDSQuery = Customer.find({
+        $or: [
+          { customername: { $regex: name, $options: "i" } },
+          {
+            businessname: { $regex: name, $options: "i" },
+          },
+        ],
+      }).select('_id')
+
+      const [productsIDS, customersIDS] = await Promise.all([productsIDSQuery, customersIDSQuery])
+      const productsPureIDS = productsIDS.map(({ _id }) => _id.toString())
+      const customersPureIDS = customersIDS.map(({ _id }) => _id.toString())
+      findQuery = {
+        $or: [
+          {
+            customer: { $in: customersPureIDS }
+          },
+          {
+            'products._id': { $in: productsPureIDS }
+          }
+        ]
+      }
+    } else {
+      findQuery = { date: moment(name).format('L') }
+    }
+    console.log(findQuery);
+    const orders = await Order.find(findQuery)
+    res.status(200).json({ orders });
   } catch (err) {
     console.log("searchOrderByProductText err", err);
   }
@@ -405,38 +398,120 @@ exports.searchOrderByProductText = async (req, res) => {
 
 //
 exports.executeDeliveryOccur = async (req, res) => {
-  console.clear();
   try {
     const today = new Date();
     const myToday = new Date(today);
-    let twoWeeksAgo = dayjs(myToday).subtract(14, "days");
-    let oneWeekAgo = dayjs(myToday).subtract(7, "days");
-    // const oneWeekLastDate = new Date(oneWeekAgo);
-    const oneWeekLastDate = moment(new Date(oneWeekAgo));
-    const startOfDay = oneWeekLastDate.startOf("day").toISOString();
-    const endOfDay = oneWeekLastDate.endOf("day").toISOString();
-    const twoWeeksLastDate = new Date(twoWeeksAgo);
-    // console.log("lastDate", lastDate);
-    //  { $gte: myYesterday, $lte: myDate }
+    const oneWeekAgo = moment(myToday).subtract(7, 'days').toDate()
+    const twoWeeksAgo = moment(myToday).subtract(14, 'days').toDate()
+
+
     const orders = await Order.aggregate([
-      // {
-      //   date: { $gte: startOfDay, $lte: endOfDay },
-      // },
       {
         $lookup: {
-          from: "Customer",
+          from: "customers",
           localField: "customer",
           foreignField: "_id",
-          as: "customer",
+          as: "customerObject",
         },
       },
+      {
+        $unwind: {
+          path: '$customerObject'
+        }
+      },
+      {
+        $lookup: {
+          from: "deliveriesoccurs",
+          localField: "customerObject.deliveryoccur",
+          foreignField: "_id",
+          as: "customerObject.deliveryoccur",
+        },
+      },
+      {
+        $unwind: {
+          path: '$customerObject.deliveryoccur'
+        }
+      },
+      {
+        $match: {
+          $or: [
+            { date: { $gte: twoWeeksAgo, $lte: new Date() }, 'customerObject.deliveryoccur.number': 2 },
+            { date: { $gte: oneWeekAgo, $lte: new Date() }, 'customerObject.deliveryoccur.number': 1 }
+          ],
+          status: 2, // only done orders
+          deliveryOccured: false ///
+        }
+      },
     ]);
-    console.log(orders, "ord");
-    // const orders = await Order.aggregate([
-    //   { $match: { date: { $gte: lastDate } } },
-    // ]);
 
-    // console.log("orders", orders);
+    const ordersIDS = orders.map((order) => order._id.toString()) // get pure orders ids
+    const updateOrdersDeliveryQuery = Order.updateMany( // update orders deliveryOccured to avoid duplication same order multiple times
+      {
+        _id: { $in: ordersIDS }
+      },
+      {
+        $set: {
+          deliveryOccured: true
+        }
+      }
+    )
+
+    const [allRuns] = await Promise.all([
+      getAllComingRuns(), //get all Runs to check
+      updateOrdersDeliveryQuery
+    ])
+
+    const bulkUpsertOps = []
+
+    const ordersToCreate = ([...orders]).map((current) => {
+
+      let order = { ...current } //clone current order
+      order._id = new mongoose.Types.ObjectId(); //generate new Order Object Id
+
+      if (!order?.customerObject) return order;
+      if (order.customerObject?.deliveryoccur?.number == 2) {
+        order.date = moment(order.date).add(14, 'days').toDate() // add 14 days to date if number is 2
+      } else {
+        order.date = moment(order.date).add(7, 'days').toDate() // add 7 days to date if number is 1
+      }
+      const formatedOrderDate = moment(order.date).format('L')
+      const customerRouteId = order.customerObject?.routeId?.toString() // customer route id from order customer object
+      const existComingRun = allRuns.find((oneComingRun) => { // check existing coming run based on date and route id then return it
+        if (!oneComingRun?.route || !oneComingRun?.date) return false;
+        let formattedRunDate = moment(oneComingRun.date).format("L");
+        let runRouteId = oneComingRun.route.toString();
+        return (formattedRunDate == formatedOrderDate && runRouteId == customerRouteId)
+      })
+      if (existComingRun) { // if coming Run, update and push the new order id
+        let runId = existComingRun._id.toString();
+        bulkUpsertOps.push({
+          updateOne: {
+            filter: { _id: runId },
+            update: { $push: { orders: order._id } },
+            upsert: true,
+          }
+        })
+      } else {// if not comin run, create new one with the new order id
+        bulkUpsertOps.push({
+          insertOne: {
+            document: {
+              date: formatedOrderDate,
+              orders: [order._id],
+              route: customerRouteId,
+            }
+          }
+        })
+      }
+      delete order.customerObject
+      order.status = 0
+      order.automaticallyGenerated = true
+      order.deliveryOccured = false
+      return order
+    })
+    let createdOrders = await Order.insertMany(ordersToCreate)
+    res.status(200).json({ orders: createdOrders }); //send created order to the client
+
+    await Run.bulkWrite(bulkUpsertOps) // create or update Runs
   } catch (err) {
     console.log("err", err);
   }
