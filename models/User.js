@@ -6,7 +6,7 @@ const UserSchema = new mongoose.Schema(
     username: { type: String, required: true, unique: true },
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
-    phonenumber: { type: String, required: true, unique: true },
+    phonenumber: { type: String, unique: true },
     lastlogin: { type: Date, default: null },
     role: { type: Number, default: 0 },
     ordersCount: { type: Number, default: 0 },
@@ -47,6 +47,8 @@ UserSchema.statics.isThisPhoneInUse = async function (phone) {
   if (!phone) throw new Error("Please enter your phone number");
   try {
     const user = await this.findOne({ phone });
+    console.log("user", user);
+    console.log("phone", phone);
     if (user) return false;
     return true;
   } catch (error) {

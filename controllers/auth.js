@@ -24,15 +24,20 @@ exports.signup = async (req, res) => {
     });
 
   //check if phone number is duplicate
-  const isNewPhoneNumber = await User.isThisPhoneInUse(phonenumber);
+  // const isNewPhoneNumber = await User.isThisPhoneInUse(phonenumber);
 
-  if (isNewPhoneNumber) {
-    return res.status(400).json({
-      success: false,
-      message:
-        "This phone number is already in use, please sign in with a different phonenumber",
-    });
-  }
+  // if (isNewPhoneNumber) {
+  //   return res.status(400).json({
+  //     success: false,
+  //     message:
+  //       "This phone number is already in use, please sign in with a different phonenumber",
+  //   });
+  // }
+  const user = await User.findOne({ phonenumber });
+  if (user)
+    return res
+      .status(399)
+      .json({ success: false, message: "This phone number already exists" });
 
   const newUser = new User({
     name: name,

@@ -38,7 +38,7 @@ exports.addCustomerToOrganization = async (req, res) => {
         message: `No customer was found by the id of ${customerId}`,
       });
     if (customer.organization) {
-      return res.status(401).json({
+      return res.status(399).json({
         success: false,
         message: `Customer by the id of ${customerId} already has a an organization`,
       });
@@ -93,7 +93,7 @@ exports.deleteOrganization = async (req, res) => {
       });
     }
     if (organization.customers.length) {
-      return res.status(401).json({
+      return res.status(399).json({
         success: false,
         message:
           "Organization already has customers in it, remove them if you want to delete it",
