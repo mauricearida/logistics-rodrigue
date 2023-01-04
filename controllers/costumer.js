@@ -147,3 +147,46 @@ exports.findCustomerByTextSearch = async (req, res) => {
     res.status(500).json(err);
   }
 };
+
+
+exports.getTopCustomers = async (req, res) => {
+  try {
+    const total = Number(req.query?.total) || 10;
+    let topCustomers = await Customer.aggregate([
+      {
+        "$lookup": {
+          from: 'orders',
+          foreignField: 'customer',
+          localField: '_id',
+          as: 'orders'
+        }
+      },
+      {
+        "$unwind": {
+          path: "$orders",
+          preserveNullAndEmptyArrays: true
+        }
+      },
+      {
+        "$group": {
+          _id: "$_id",
+          name: { $first: '$customername' },
+          "totalOrdersAmount": { "$sum": "$orders.totalamount" },
+        }
+      },
+      {
+        "$match": {
+          "totalOrdersAmount": { $gt: 0 }
+        }
+      },
+      { "$sort": { "totalOrdersAmount": -1 } },
+      { "$limit": total }
+    ])
+    const names = topCustomers.map((cust) => cust.name)
+    const totalOrdersAmount = topCustomers.map((cust) => cust.totalOrdersAmount)
+    res.json({ data: totalOrdersAmount, labels: names })
+  } catch (err) {
+    await log(err);
+    res.status(500).json(err);
+  }
+};
