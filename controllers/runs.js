@@ -65,10 +65,19 @@ exports.getComingRuns = async (routeId) => {
     if (run) {
       return run;
     } else {
-      console.log("no runs found");
+      return []
     }
   } catch (err) {
     console.log("getComingRuns err", err);
+  }
+};
+exports.getAllComingRuns = async () => {
+  try {
+    const runs = await Run.find({ $or: [{ status: 0 }, { status: 1 }] });
+    return runs || []
+  } catch (err) {
+    console.log("getComingRuns err", err);
+    return []
   }
 };
 
