@@ -501,6 +501,10 @@ exports.executeDeliveryOccur = async (req, res) => {
       order.status = 0;
       order.automaticallyGenerated = true;
       order.deliveryOccured = false;
+      order.products = order.products.map((product) => {
+        delete product._id;
+        return product;
+      });
       return order;
     });
     let createdOrders = await Order.insertMany(ordersToCreate);
