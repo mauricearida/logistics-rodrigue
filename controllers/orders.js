@@ -388,7 +388,6 @@ exports.searchOrderByProductText = async (req, res) => {
     } else {
       findQuery = { date: moment(name).format('L') }
     }
-    console.log(findQuery);
     const orders = await Order.find(findQuery)
     res.status(200).json({ orders });
   } catch (err) {
