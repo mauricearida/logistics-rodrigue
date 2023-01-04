@@ -178,3 +178,43 @@ exports.findProductsByTextSearch = async (req, res) => {
     res.status(500).json(err);
   }
 };
+
+exports.getTopOrderedProducts = async (req, res) => {
+  try {
+    const total = Number(req.query?.total) || 10;
+    let topProducts = await Products.aggregate([
+      {
+        "$lookup": {
+          from: 'orders',
+          foreignField: 'products.product',
+          localField: '_id',
+          as: 'orders'
+        }
+      },
+      {
+        "$unwind": {
+          path: "$orders",
+          preserveNullAndEmptyArrays: true
+        }
+      },
+      {
+        "$unwind": "$orders.products"
+      },
+      {
+        "$group": {
+          _id: "$_id",
+          name: { $first: '$name' },
+          "totalOrdersQuantity": { "$sum": "$orders.products.quantity" },
+        }
+      },
+      { "$sort": { "totalOrdersQuantity": -1 } },
+      { "$limit": total }
+    ])
+    const names = topProducts.map((prod) => prod.name)
+    const ordersQuantity = topProducts.map((prod) => prod.totalOrdersQuantity)
+    res.json({ data: ordersQuantity, labels: names })
+  } catch (err) {
+    await log(err);
+    res.status(500).json(err);
+  }
+};
