@@ -55,7 +55,12 @@ exports.validateCreateCustomer = [
     .isEmpty()
     .withMessage("Please provide at least one address"),
   check("suburb").trim().not().isEmpty().withMessage("Suburb Name is missing"),
-  check("email").isEmail().withMessage("Email is Invalid"),
+  check("email")
+    .isEmail()
+    .withMessage("Email is Invalid")
+    .not()
+    .isEmpty()
+    .withMessage("Email is missing"),
   check("customername")
     .trim()
     .not()
