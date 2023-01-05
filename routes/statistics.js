@@ -3,6 +3,7 @@ const {
   getOrdersByUserId,
   getSalesByDay,
   getSalesPerUser,
+  getSalesByDateRange,
 } = require("../controllers/statistics");
 const { verifyTokenAndAdmin } = require("../middlewares/verifyToken");
 
@@ -13,4 +14,5 @@ router
   .route("/getorderbyuser/:id")
   .get(verifyTokenAndAdmin, validateMongoId, validate, getOrdersByUserId);
 router.route("/").get(verifyTokenAndAdmin, getSalesPerUser);
+router.route("/sales-by-date-range").get(verifyTokenAndAdmin, getSalesByDateRange);
 module.exports = router;
