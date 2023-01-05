@@ -1,8 +1,8 @@
 const Order = require("../models/Orders");
 const User = require("../models/User");
-const Run = require("../models/Run");
 const { log } = require("../helpers/Loger");
 const dayjs = require("dayjs");
+const moment = require('moment')
 
 exports.getLastMonthSales = async (req, res) => {
   console.clear();
@@ -104,6 +104,57 @@ exports.getSalesMonth = async (req, res) => {
   }
 };
 
+exports.getSalesByDateRange = async (req, res) => {
+
+  try {
+    const to1 = moment(new Date(req.query.to1))
+    const to2 = moment(new Date(req.query.to2))
+    const days = Number(req.query.days || 30)
+    const previousPeriod1 = moment(to1).subtract(days, 'days')
+    const previousPeriod2 = moment(to2).subtract(days, 'days')
+    // console.log(previousPeriod2.toDate(), to2.toDate());
+    const orders = await Order.aggregate([
+      {
+        $match: {
+          $or: [
+            { date: { $gte: previousPeriod1.toDate(), $lte: to1.toDate() } },
+            { date: { $gte: previousPeriod2.toDate(), $lte: to2.toDate() } }
+          ]
+        }
+      },
+      {
+        $group: {
+          _id: { $dateToString: { format: "%Y-%m-%d", date: "$date" } },
+          totalAmount: {
+            $sum: '$totalamount'
+          }
+        }
+      }
+    ]);
+    const labels = []
+    const dataset1 = []
+    const dataset2 = []
+    for (const m = moment(previousPeriod1.add(1, 'days')); m.isSameOrBefore(to1); m.add(1, 'days')) {
+      const d = m.date()
+      labels.push(d)
+      const order = orders.find((order) => {
+        console.log(order._id, m.format('YYYY-MM-DD'));
+        return order._id == m.format('YYYY-MM-DD')
+      })
+      dataset1.push(order?.totalAmount ?? 0)
+    }
+    for (const m = moment(previousPeriod2.add(1, 'days')); m.isSameOrBefore(to2); m.add(1, 'days')) {
+      const order = orders.find((order) => order._id == m.format('YYYY-MM-DD'))
+      dataset2.push(order?.totalAmount ?? 0)
+    }
+
+    res.status(200).json({ labels, dataset1, dataset2 });
+  } catch (err) {
+    console.log("getSalesByDay err", err);
+    await log(err);
+    res.status(500).json(err);
+  }
+};
 exports.getSalesPerUser = async (req, res) => {
   console.clear();
   // const { doneones } = req.query;
