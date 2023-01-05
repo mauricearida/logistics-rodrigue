@@ -2,8 +2,15 @@ const Route = require("../models/Route");
 const { log } = require("../helpers/Loger");
 
 exports.createRoute = async (req, res) => {
+  const { name } = req.body;
   const newRoute = new Route(req.body);
   try {
+    const nameInUse = await Route.findOne({ name });
+    if (nameInUse) {
+      return res
+        .status(399)
+        .json({ success: false, message: "The route name already exists" });
+    }
     const savedRoute = await newRoute.save();
     res.status(200).json(savedRoute);
   } catch (err) {

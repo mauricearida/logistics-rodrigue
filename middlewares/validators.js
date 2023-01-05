@@ -134,6 +134,12 @@ exports.creatingRoute = [
     .not()
     .isEmpty()
     .withMessage("Route places are missing"),
+  check("from")
+    .trim()
+    .not()
+    .isEmpty()
+    .withMessage("From attribute is required"),
+  check("to").trim().not().isEmpty().withMessage("To attribute is required"),
 ];
 
 // Creating RUNS

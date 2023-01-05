@@ -7,7 +7,6 @@ const RouteSchema = new mongoose.Schema(
     from: { type: String },
     to: { type: String },
     places: [{ type: String }],
-    note: { type: String },
   },
   { timestamps: true }
 );

@@ -65,7 +65,7 @@ exports.getComingRuns = async (routeId) => {
     if (run) {
       return run;
     } else {
-      return []
+      return [];
     }
   } catch (err) {
     console.log("getComingRuns err", err);
@@ -74,16 +74,16 @@ exports.getComingRuns = async (routeId) => {
 exports.getAllComingRuns = async () => {
   try {
     const runs = await Run.find({ $or: [{ status: 0 }, { status: 1 }] });
-    return runs || []
+    return runs || [];
   } catch (err) {
     console.log("getComingRuns err", err);
-    return []
+    return [];
   }
 };
 
 exports.getAllRuns = async (req, res) => {
   try {
-    const runs = await Run.find().sort({ _id: -1 });
+    const runs = await Run.find().sort({ date: -1 }).populate("route");
     const runCount = await Run.countDocuments();
     let objectTosend = {
       runCount,
