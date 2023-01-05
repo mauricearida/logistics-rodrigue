@@ -44,7 +44,7 @@ exports.deleteRun = async (req, res) => {
 
 exports.getRun = async (req, res) => {
   try {
-    const run = await Run.findById(req.params.id);
+    const run = await Run.findById(req.params.id).populate("orders");
     if (run) {
       res.status(200).json(run);
     } else {
@@ -86,6 +86,7 @@ exports.getAllRuns = async (req, res) => {
     const runs = await Run.find()
       .sort({ date: -1 })
       .populate("route")
+      .populate("orders")
       .populate("driver", { name: 1 });
     const runCount = await Run.countDocuments();
     let objectTosend = {
