@@ -7,12 +7,16 @@ const {
   getRouteRoute,
   getAllRoutes,
 } = require("../controllers/routes");
-const { validateMongoId, validate } = require("../middlewares/validators");
+const {
+  validateMongoId,
+  validate,
+  creatingRoute,
+} = require("../middlewares/validators");
 const { verifyTokenAndAdmin } = require("../middlewares/verifyToken");
 
 router
   .route("/")
-  .post(verifyTokenAndAdmin, createRoute, validate, createRoute)
+  .post(verifyTokenAndAdmin, creatingRoute, validate, createRoute)
   .get(getAllRoutes);
 
 router

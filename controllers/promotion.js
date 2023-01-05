@@ -11,7 +11,7 @@ exports.createpromotion = async (req, res) => {
     let fromDate = new Date(from);
     let toDate = new Date(to);
 
-    if (fromDate < now || toDate < now) {
+    if (toDate < now) {
       return res.status(400).json({
         success: false,
         message: "Please enter dates in the future",
