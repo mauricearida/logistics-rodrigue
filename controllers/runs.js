@@ -83,7 +83,10 @@ exports.getAllComingRuns = async () => {
 
 exports.getAllRuns = async (req, res) => {
   try {
-    const runs = await Run.find().sort({ date: -1 }).populate("route");
+    const runs = await Run.find()
+      .sort({ date: -1 })
+      .populate("route")
+      .populate("driver", { name: 1 });
     const runCount = await Run.countDocuments();
     let objectTosend = {
       runCount,
