@@ -12,30 +12,25 @@ const { default: mongoose } = require("mongoose");
 
 exports.sendCustomeIdToCreateOrder = async (req, res) => {
   try {
-    console.clear();
-    const { page } = req.query;
-    const limit = 30;
+    const page = req.query?.page || 1;
+    const limit = req.query?.limit || 30;
 
-    if (!page)
-      return res.status(400).json("the required query parameter is page");
-
-    //===================
-    const customer = await Customer.findById(req.params.id);
-
+    const customer = await Customer.findById(req.params.id).populate({
+      path: "promotions",
+      match: {
+        from: { $lte: new Date() },
+        to: { $gte: new Date() }
+      }
+    })
     if (!customer) {
       return res
         .status(404)
         .json({ success: false, message: "No customer is found by this Id!" });
     }
-    const products = await Products.find({ visibility: true })
+    let products = await Products.find({ visibility: true })
       .limit(limit * 1)
-      .skip((page - 1) * limit);
+      .skip((page - 1) * limit).lean()
 
-    if (!products) {
-      return res
-        .status(404)
-        .json({ success: false, message: "Could not fetch products" });
-    }
     if (!customer?.promotions?.length) {
       return res.status(200).json({
         success: true,
@@ -43,76 +38,29 @@ exports.sendCustomeIdToCreateOrder = async (req, res) => {
         data: products,
       });
     }
-
-    let customerproductpromotions = [];
-    let customercategorypromotions = [];
-
-    let promotionsArray = customer.promotions;
-    for (let i = 0; i < promotionsArray.length; i++) {
-      const promotion = await Promotion.findById(promotionsArray[i].toString());
-
-      if (!promotion) {
-        continue;
+    let categoryDiscounts = []
+    let productsDiscounts = []
+    customer.promotions.forEach((prom) => {
+      if (prom.categorypromotion?.categoryId) {
+        categoryDiscounts.push(({ categoryId: prom?.categorypromotion?.categoryId, discountpercentage: prom?.categorypromotion?.discountpercentage }))
       }
-
-      let now = new Date();
-      let fromDate = new Date(promotion.from);
-      let toDate = new Date(promotion.to);
-
-      if (fromDate > now || toDate < now) {
-        continue;
+      if (prom?.productspromotion?.length) {
+        productsDiscounts = prom?.productspromotion?.map(({ productId, newprice }) => ({ productId, newprice }))
       }
-
-      if (!(JSON.stringify(promotion.categorypromotion) == "{}")) {
-        customercategorypromotions.push(promotion);
-      } else if (promotion.productspromotion.length) {
-        customerproductpromotions.push(promotion);
+    })
+    products = products.map((product) => {
+      const newProduct = { ...product }
+      const categoryDiscount = categoryDiscounts.find((catDiscount) => catDiscount?.categoryId && catDiscount.categoryId.toString() == product?.categoryId?.toString())
+      const productDiscount = productsDiscounts.find((prodDiscount) => prodDiscount?.productId && prodDiscount.productId.toString() == product?._id?.toString())
+      if (categoryDiscount?.discountpercentage) {
+        newProduct.promotionPrice = product.price * ((100 - categoryDiscount.discountpercentage) / 100);
       }
-    }
-
-    let customerCategoryPromotionsIds = [];
-    let customerProductsPromotionsIds = [];
-
-    customercategorypromotions.forEach(
-      (cat) =>
-        (customerCategoryPromotionsIds = [
-          ...customerCategoryPromotionsIds,
-          cat.categorypromotion.categoryId.toString(),
-        ])
-    );
-
-    customerproductpromotions.forEach((promotion) =>
-      promotion.productspromotion.forEach((product) => {
-        customerProductsPromotionsIds = [
-          ...customerProductsPromotionsIds,
-          product.productId.toString(),
-        ];
-      })
-    );
-
-    products.forEach((product) => {
-      if (
-        customerCategoryPromotionsIds.includes(product.categoryId.toString())
-      ) {
-        let discountPercentage = customercategorypromotions.filter(
-          (cat) =>
-            cat.categorypromotion.categoryId.toString() ===
-            product.categoryId.toString()
-        )[0].categorypromotion.discountpercentage;
-
-        product.promotionPrice =
-          product.price * ((100 - discountPercentage) / 100);
+      if (productDiscount) {
+        newProduct.promotionPrice = productDiscount?.newprice ?? newProduct.price
       }
-      if (customerProductsPromotionsIds.includes(product._id.toString())) {
-        let newPrice = customerproductpromotions.filter(
-          (prod) =>
-            prod.productspromotion[0].productId.toString() ===
-            product._id.toString()
-        )[0]?.productspromotion[0]?.newprice;
+      return newProduct;
+    })
 
-        product.promotionPrice = newPrice;
-      }
-    });
 
     return res.status(200).json({
       success: true,
@@ -279,19 +227,19 @@ exports.getAllOrders = async (req, res) => {
     const orders =
       done === "all"
         ? await Order.find()
-            .populate("customer")
-            .populate({
-              path: "products",
-              populate: {
-                path: "product",
-                model: "Product",
-              },
-            })
-            .sort({ date: -1 })
-            .limit(limit * 1)
-            .skip((page - 1) * limit)
+          .populate("customer")
+          .populate({
+            path: "products",
+            populate: {
+              path: "product",
+              model: "Product",
+            },
+          })
+          .sort({ date: -1 })
+          .limit(limit * 1)
+          .skip((page - 1) * limit)
         : done === "false"
-        ? await Order.find({
+          ? await Order.find({
             $or: [{ status: 0 }, { status: 1 }, { status: 3 }],
           })
             .populate("customer")
@@ -305,7 +253,7 @@ exports.getAllOrders = async (req, res) => {
             .sort({ date: -1 })
             .limit(limit * 1)
             .skip((page - 1) * limit)
-        : await Order.find({ status: 2 })
+          : await Order.find({ status: 2 })
             .populate("customer")
             .populate({
               path: "products",
