@@ -11,7 +11,6 @@ exports.createRun = async (req, res) => {
     res.status(500).json(err);
   }
 };
-
 exports.updateRun = async (req, res) => {
   try {
     const updatedRun = await Run.findByIdAndUpdate(
@@ -31,7 +30,6 @@ exports.updateRun = async (req, res) => {
     res.status(500).json(err);
   }
 };
-
 exports.deleteRun = async (req, res) => {
   try {
     await Run.findByIdAndDelete(req.params.id);
@@ -41,7 +39,6 @@ exports.deleteRun = async (req, res) => {
     res.status(500).json(err);
   }
 };
-
 exports.getRun = async (req, res) => {
   try {
     const run = await Run.findById(req.params.id).populate("orders");
@@ -55,7 +52,6 @@ exports.getRun = async (req, res) => {
     res.status(500).json(err);
   }
 };
-
 exports.getComingRuns = async (routeId) => {
   try {
     const run = await Run.find({
@@ -80,7 +76,6 @@ exports.getAllComingRuns = async () => {
     return [];
   }
 };
-
 exports.getAllRuns = async (req, res) => {
   try {
     const runs = await Run.find()
