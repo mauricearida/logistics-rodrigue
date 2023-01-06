@@ -23,6 +23,7 @@ const {
   peopleRoute,
   organizationRoute,
   statisticsRoute,
+  driversRoute,
 } = require("./routes");
 
 // https://monjay.app.qore.com.au/customers/add
@@ -50,7 +51,7 @@ app.use(compression());
 app.use("/api/auth", authRoute);
 
 app.use("/api/users", authRoute);
-app.use("/api/drivers", authRoute);
+app.use("/api/drivers", driversRoute);
 app.use("/api/runs", runsRoute);
 app.use("/api/biller", billersRoute);
 app.use("/api/users", usersRoute);

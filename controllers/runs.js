@@ -41,7 +41,11 @@ exports.deleteRun = async (req, res) => {
 };
 exports.getRun = async (req, res) => {
   try {
-    const run = await Run.findById(req.params.id).populate("orders");
+    const run = await Run.findById(req.params.id).populate({
+      path: "orders",
+      populate: { path: "customer" },
+    });
+
     if (run) {
       res.status(200).json(run);
     } else {

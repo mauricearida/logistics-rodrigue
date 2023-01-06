@@ -57,11 +57,11 @@ CustomerSchema.statics.isThisBusinessNameInUse = async function (businessname) {
   if (!businessname)
     throw new Error("Please ente a business name for the product");
   try {
-    const product = await this.findOne({ businessname });
-    if (product) return false;
+    const customer = await this.findOne({ businessname });
+    if (customer) return false;
     return true;
   } catch (error) {
-    console.error(`error inside isThisCodeInUse method`, error.message);
+    console.error(`error inside isThisBusinessNameInUse method`, error.message);
     return false;
   }
 };
