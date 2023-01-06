@@ -116,6 +116,7 @@ exports.getSalesByDateRange = async (req, res) => {
             { date: { $gte: previousPeriod1.toDate(), $lte: to1.toDate() } },
             { date: { $gte: previousPeriod2.toDate(), $lte: to2.toDate() } },
           ],
+          status: 2
         },
       },
       {
