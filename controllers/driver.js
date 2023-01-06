@@ -16,15 +16,12 @@ exports.createDriver = async (req, res) => {
         "63663fa59b531a420083d78f"
       );
       let codeid = codeSequence.drivercodeid;
-      console.log("codeid", codeid);
       codeid = codeid.toString();
 
       while (codeid.length < 4) {
         codeid = "0" + codeid;
       }
-      console.log("codsssssseid", codeid);
       newDriver.code = codeid;
-      console.log("nerDriverrrrrr", newDriver);
       const savedDriver = await newDriver.save();
       res.status(200).json(savedDriver);
       await Sharedrecords.findByIdAndUpdate("63663fa59b531a420083d78f", {
@@ -36,7 +33,6 @@ exports.createDriver = async (req, res) => {
     res.status(500).json(err);
   }
 };
-
 exports.updateDriver = async (req, res) => {
   try {
     const updatedDriver = await Driver.findByIdAndUpdate(
@@ -57,7 +53,6 @@ exports.updateDriver = async (req, res) => {
     res.status(500).json(err);
   }
 };
-
 exports.deleteDriver = async (req, res) => {
   try {
     await Driver.findByIdAndDelete(req.params.id);
@@ -67,7 +62,6 @@ exports.deleteDriver = async (req, res) => {
     res.status(500).json(err);
   }
 };
-
 exports.getDriver = async (req, res) => {
   try {
     const driver = await Driver.findById(req.params.id);
@@ -81,7 +75,6 @@ exports.getDriver = async (req, res) => {
     res.status(500).json(err);
   }
 };
-
 exports.getAllDrivers = async (req, res) => {
   try {
     const drivers = await Driver.find().sort({ _id: -1 });
@@ -100,3 +93,4 @@ exports.getAllDrivers = async (req, res) => {
     res.status(500).json(err);
   }
 };
+s;
