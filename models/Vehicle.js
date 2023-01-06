@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const Run = require("./Run");
 
 const VehicleSchema = new mongoose.Schema(
   {
@@ -25,5 +26,39 @@ VehicleSchema.statics.isThisPlateInUse = async function (plate) {
     return false;
   }
 };
+
+
+VehicleSchema.methods.isAvailable = async function () {
+  try {
+    const run = await Run.exists({ vehicle: this._id })
+    return !Boolean(run)
+  } catch (e) {
+    return true
+  }
+}
+
+VehicleSchema.statics.getAvailables = async function () {
+  try {
+    const vehicles = await this.aggregate([
+      {
+        $lookup: {
+          from: 'runs',
+          foreignField: 'vehicle',
+          localField: '_id',
+          as: 'runs'
+        },
+      },
+      {
+        $match: {
+          runs: { $size: 0 }
+        }
+      }
+
+    ])
+    return vehicles
+  } catch (e) {
+    return null
+  }
+}
 
 module.exports = mongoose.model("Vehicle", VehicleSchema);

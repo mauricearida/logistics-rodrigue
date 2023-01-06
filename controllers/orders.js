@@ -401,6 +401,7 @@ exports.executeDeliveryOccur = async (req, res) => {
     ]);
 
     const bulkUpsertOps = [];
+    const inserts = []
 
     const ordersToCreate = [...orders].map((current) => {
       let order = { ...current }; //clone current order
@@ -435,15 +436,16 @@ exports.executeDeliveryOccur = async (req, res) => {
         });
       } else {
         // if not comin run, create new one with the new order id
-        bulkUpsertOps.push({
-          insertOne: {
-            document: {
-              date: formatedOrderDate,
-              orders: [order._id],
-              route: customerRouteId,
-            },
-          },
-        });
+        inserts.push({ date: formatedOrderDate, orders: [order._id], route: customerRouteId })
+        // bulkUpsertOps.push({
+        //   insertOne: {
+        //     document: {
+        //       date: formatedOrderDate,
+        //       orders: [order._id],
+        //       route: customerRouteId,
+        //     },
+        //   },
+        // });
       }
       delete order.customerObject;
       order.status = 0;
@@ -457,8 +459,7 @@ exports.executeDeliveryOccur = async (req, res) => {
     });
     let createdOrders = await Order.insertMany(ordersToCreate);
     res.status(200).json({ orders: createdOrders }); //send created order to the client
-
-    await Run.bulkWrite(bulkUpsertOps); // create or update Runs
+    await Promise.all([Run.bulkWrite(bulkUpsertOps), Run.insertMany(inserts)]) // create or update Runs
   } catch (err) {
     console.log("err", err);
   }
