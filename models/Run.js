@@ -9,7 +9,7 @@ const RunSchema = new mongoose.Schema(
     date: { type: Date },
     note: { type: String },
     status: { type: Number, default: 0 },
-    driver: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+    driver: { type: mongoose.Schema.Types.ObjectId, ref: "Driver" },
     vehicle: { type: mongoose.Schema.Types.ObjectId, ref: "Vehicle" },
     orders: [
       {

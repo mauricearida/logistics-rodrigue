@@ -14,7 +14,6 @@ const UserSchema = new mongoose.Schema(
 
     // 0 = user
     // 1 = admin
-    // 2 = driver (does not user the website)
   },
   { timestamps: true }
 );

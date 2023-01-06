@@ -150,7 +150,6 @@ exports.creatingRoute = [
 // Creating RUNS
 exports.creatingRun = [
   check("route").trim().not().isEmpty().withMessage("Route Id is missing"),
-  check("driver").trim().not().isEmpty().withMessage("Driver Id is missing"),
   check("places")
     .trim()
     .not()
