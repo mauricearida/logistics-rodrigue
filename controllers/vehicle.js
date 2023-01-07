@@ -19,7 +19,6 @@ exports.createVehicle = async (req, res) => {
     res.status(500).json(err);
   }
 };
-
 exports.updateVehicle = async (req, res) => {
   try {
     const updatedVehicle = await Vehicle.findByIdAndUpdate(
@@ -39,7 +38,6 @@ exports.updateVehicle = async (req, res) => {
     res.status(500).json(err);
   }
 };
-
 exports.deleteVehicle = async (req, res) => {
   try {
     await Vehicle.findByIdAndDelete(req.params.id);
@@ -49,7 +47,6 @@ exports.deleteVehicle = async (req, res) => {
     res.status(500).json(err);
   }
 };
-
 exports.getVehicle = async (req, res) => {
   try {
     const vehicle = await Vehicle.findById(req.params.id);
@@ -63,7 +60,6 @@ exports.getVehicle = async (req, res) => {
     res.status(500).json(err);
   }
 };
-
 exports.getAllVehicles = async (req, res) => {
   try {
     const vehicles = await Vehicle.find().sort({ _id: -1 });

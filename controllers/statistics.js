@@ -27,7 +27,6 @@ exports.getSalesByDay = async (req, res) => {
     res.status(500).json(err);
   }
 };
-
 exports.getOrdersByUserId = async (req, res) => {
   let userId = req.params.id;
   try {
@@ -45,7 +44,6 @@ exports.getOrdersByUserId = async (req, res) => {
     res.status(500).json(err);
   }
 };
-
 exports.getSalesMonth = async (req, res) => {
   console.clear();
   const { date } = req.query;
@@ -69,7 +67,6 @@ exports.getSalesMonth = async (req, res) => {
     res.status(500).json(err);
   }
 };
-
 exports.getSalesByDateRange = async (req, res) => {
   try {
     const to1 = moment(new Date(req.query.to1));
@@ -128,10 +125,8 @@ exports.getSalesByDateRange = async (req, res) => {
     res.status(500).json(err);
   }
 };
-
 exports.getSalesPerUser = async (req, res) => {
   console.clear();
-
   try {
     const users = await User.find();
     for (let i = 0; i < users.length; i++) {
