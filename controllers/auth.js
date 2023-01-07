@@ -7,44 +7,37 @@ exports.signup = async (req, res) => {
   const { name, email, phonenumber, username, role } = req.body;
 
   //check if email is duplicate
-  const isNewEmailUser = await User.isThisEmailInUse(email);
-  if (!isNewEmailUser)
+  const emailUser = await User.findOne({ email });
+  if (emailUser) {
     return res.status(400).json({
       success: false,
       message: "This email is already in use, try sign-in with a different one",
     });
+  }
+
   //check if name is duplicate
-  const isNewUsername = await User.isThisUsernameInUse(username);
-  console.log(`isNewUsername`, isNewUsername);
-  if (!isNewUsername)
+  const nameUser = await User.findOne({ name });
+  if (nameUser) {
     return res.status(400).json({
       success: false,
-      message:
-        "This name is already in use, please sign in with a different username",
+      message: "This name is already in use, try sign-in with a different one",
     });
+  }
 
-  //check if phone number is duplicate
-  // const isNewPhoneNumber = await User.isThisPhoneInUse(phonenumber);
-
-  // if (isNewPhoneNumber) {
-  //   return res.status(400).json({
-  //     success: false,
-  //     message:
-  //       "This phone number is already in use, please sign in with a different phonenumber",
-  //   });
-  // }
-  const user = await User.findOne({ phonenumber });
-  if (user)
+  //check if phonenumber is duplicate
+  const phonenumberUser = await User.findOne({ phonenumber });
+  if (phonenumberUser) {
     return res
       .status(399)
       .json({ success: false, message: "This phone number already exists" });
+  }
 
   const newUser = new User({
-    name: name,
-    username: username,
-    email: email,
-    phonenumber: phonenumber,
-    role: role,
+    name,
+    username,
+    email,
+    phonenumber,
+    role,
     password: CryptoJS.AES.encrypt(
       req.body.password,
       process.env.PASS_SEC

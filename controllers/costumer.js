@@ -3,6 +3,7 @@ const Sharedrecords = require("../models/Sharedrecords");
 const { log } = require("../helpers/Loger");
 
 exports.createCostumer = async (req, res) => {
+  const { businessname, email } = req.body;
   const newCustomer = new Customer(req.body);
   const codeSequence = await Sharedrecords.findById("63663fa59b531a420083d78f");
   let codeid = codeSequence.customercodeid;
@@ -13,23 +14,23 @@ exports.createCostumer = async (req, res) => {
   }
   newCustomer.codeid = codeid;
 
-  const isNewBusinessName = await Customer.isThisBusinessNameInUse(
-    req.body.businessname
-  );
-  if (!isNewBusinessName)
+  const businessnameUser = await User.findOne({ businessname });
+  if (businessnameUser) {
     return res.status(400).json({
       success: false,
       message:
-        "This business name is already in use, try register with a different one",
+        "This businessname is already in use, try sign-in with a different one",
     });
+  }
 
-  const isNewEmail = await Customer.isThisEmailInUse(req.body.email);
-  if (!isNewEmail)
+  const emailUser = await User.findOne({ email });
+  if (emailUser) {
     return res.status(400).json({
       success: false,
-      message:
-        "This email is already in use, try register with a different one",
+      message: "This email is already in use, try sign-in with a different one",
     });
+  }
+
   try {
     const savedCustomer = await newCustomer.save();
     res.status(200).json(savedCustomer);
@@ -147,44 +148,44 @@ exports.findCustomerByTextSearch = async (req, res) => {
     res.status(500).json(err);
   }
 };
-
-
 exports.getTopCustomers = async (req, res) => {
   try {
     const total = Number(req.query?.total) || 10;
     let topCustomers = await Customer.aggregate([
       {
-        "$lookup": {
-          from: 'orders',
-          foreignField: 'customer',
-          localField: '_id',
-          as: 'orders'
-        }
+        $lookup: {
+          from: "orders",
+          foreignField: "customer",
+          localField: "_id",
+          as: "orders",
+        },
       },
       {
-        "$unwind": {
+        $unwind: {
           path: "$orders",
-          preserveNullAndEmptyArrays: true
-        }
+          preserveNullAndEmptyArrays: true,
+        },
       },
       {
-        "$group": {
+        $group: {
           _id: "$_id",
-          name: { $first: '$customername' },
-          "totalOrdersAmount": { "$sum": "$orders.totalamount" },
-        }
+          name: { $first: "$customername" },
+          totalOrdersAmount: { $sum: "$orders.totalamount" },
+        },
       },
       {
-        "$match": {
-          "totalOrdersAmount": { $gt: 0 }
-        }
+        $match: {
+          totalOrdersAmount: { $gt: 0 },
+        },
       },
-      { "$sort": { "totalOrdersAmount": -1 } },
-      { "$limit": total }
-    ])
-    const names = topCustomers.map((cust) => cust.name)
-    const totalOrdersAmount = topCustomers.map((cust) => cust.totalOrdersAmount)
-    res.json({ data: totalOrdersAmount, labels: names })
+      { $sort: { totalOrdersAmount: -1 } },
+      { $limit: total },
+    ]);
+    const names = topCustomers.map((cust) => cust.name);
+    const totalOrdersAmount = topCustomers.map(
+      (cust) => cust.totalOrdersAmount
+    );
+    res.json({ data: totalOrdersAmount, labels: names });
   } catch (err) {
     await log(err);
     res.status(500).json(err);

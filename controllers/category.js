@@ -23,7 +23,6 @@ exports.createCategory = async (req, res) => {
     return res.status(400).json("A category name is required");
   }
 };
-
 exports.updateCategory = async (req, res) => {
   try {
     const updatedCategory = await Category.findByIdAndUpdate(
@@ -43,7 +42,6 @@ exports.updateCategory = async (req, res) => {
     res.status(500).json(err);
   }
 };
-
 exports.deleteCategory = async (req, res) => {
   try {
     await Category.findByIdAndDelete(req.params.id);
@@ -53,14 +51,13 @@ exports.deleteCategory = async (req, res) => {
     res.status(500).json(err);
   }
 };
-
 exports.getCategory = async (req, res) => {
   try {
     const category = await Category.findById(req.params.id);
     const productCount = await Products.countDocuments({
       categoryId: req.params.id,
     });
-    console.log("productCount", productCount);
+
     if (category) {
       category.productCount = productCount;
 
@@ -73,7 +70,6 @@ exports.getCategory = async (req, res) => {
     res.status(500).json(err);
   }
 };
-
 exports.getAllCategories = async (req, res) => {
   try {
     const categories = await Category.find().sort({ _id: -1 });
