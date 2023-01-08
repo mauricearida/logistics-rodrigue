@@ -12,7 +12,7 @@ const DriverSchema = new mongoose.Schema(
 
 DriverSchema.methods.isAvailable = async function () {
   try {
-    const run = await Run.findOne({ driver: this._id })
+    const run = await Run.findOne({ driver: this._id, status: { $lte: 1 } })
     return !Boolean(run)
   } catch (e) {
     return true
@@ -25,18 +25,30 @@ DriverSchema.statics.getAvailables = async function () {
     const drivers = await this.aggregate([
       {
         $lookup: {
-          from: 'drivers',
+          from: 'runs',
           foreignField: 'driver',
           localField: '_id',
-          as: 'drivers'
+          as: 'run'
+        },
+      },
+      {
+        $unwind: {
+          path: "$run",
+          preserveNullAndEmptyArrays: true
         },
       },
       {
         $match: {
-          drivers: { $size: 0 }
+          $or: [
+            {
+              run: { $exists: false }
+            },
+            {
+              'run.status': { $lte: 0 }
+            }
+          ]
         }
       }
-
     ])
     return drivers
   } catch (e) {

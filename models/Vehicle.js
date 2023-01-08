@@ -30,7 +30,7 @@ VehicleSchema.statics.isThisPlateInUse = async function (plate) {
 
 VehicleSchema.methods.isAvailable = async function () {
   try {
-    const run = await Run.exists({ vehicle: this._id })
+    const run = await Run.exists({ vehicle: this._id, status: { $lte: 1 } })
     return !Boolean(run)
   } catch (e) {
     return true
@@ -39,21 +39,33 @@ VehicleSchema.methods.isAvailable = async function () {
 
 VehicleSchema.statics.getAvailables = async function () {
   try {
-    const vehicles = await this.aggregate([
+    const vehicles = await mongoose.model("Vehicle", VehicleSchema).aggregate([
       {
         $lookup: {
           from: 'runs',
           foreignField: 'vehicle',
           localField: '_id',
-          as: 'runs'
+          as: 'run'
+        },
+      },
+      {
+        $unwind: {
+          path: "$run",
+          preserveNullAndEmptyArrays: true
         },
       },
       {
         $match: {
-          runs: { $size: 0 }
+          $or: [
+            {
+              run: { $exists: false }
+            },
+            {
+              'run.status': { $lte: 0 }
+            }
+          ]
         }
       }
-
     ])
     return vehicles
   } catch (e) {
