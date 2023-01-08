@@ -19,9 +19,9 @@ exports.sendCustomeIdToCreateOrder = async (req, res) => {
       path: "promotions",
       match: {
         from: { $lte: new Date() },
-        to: { $gte: new Date() }
-      }
-    })
+        to: { $gte: new Date() },
+      },
+    });
     if (!customer) {
       return res
         .status(404)
@@ -29,7 +29,8 @@ exports.sendCustomeIdToCreateOrder = async (req, res) => {
     }
     let products = await Products.find({ visibility: true })
       .limit(limit * 1)
-      .skip((page - 1) * limit).lean()
+      .skip((page - 1) * limit)
+      .lean();
 
     if (!customer?.promotions?.length) {
       return res.status(200).json({
@@ -38,29 +39,43 @@ exports.sendCustomeIdToCreateOrder = async (req, res) => {
         data: products,
       });
     }
-    let categoryDiscounts = []
-    let productsDiscounts = []
+    let categoryDiscounts = [];
+    let productsDiscounts = [];
     customer.promotions.forEach((prom) => {
       if (prom.categorypromotion?.categoryId) {
-        categoryDiscounts.push(({ categoryId: prom?.categorypromotion?.categoryId, discountpercentage: prom?.categorypromotion?.discountpercentage }))
+        categoryDiscounts.push({
+          categoryId: prom?.categorypromotion?.categoryId,
+          discountpercentage: prom?.categorypromotion?.discountpercentage,
+        });
       }
       if (prom?.productspromotion?.length) {
-        productsDiscounts = prom?.productspromotion?.map(({ productId, newprice }) => ({ productId, newprice }))
+        productsDiscounts = prom?.productspromotion?.map(
+          ({ productId, newprice }) => ({ productId, newprice })
+        );
       }
-    })
+    });
     products = products.map((product) => {
-      const newProduct = { ...product }
-      const categoryDiscount = categoryDiscounts.find((catDiscount) => catDiscount?.categoryId && catDiscount.categoryId.toString() == product?.categoryId?.toString())
-      const productDiscount = productsDiscounts.find((prodDiscount) => prodDiscount?.productId && prodDiscount.productId.toString() == product?._id?.toString())
+      const newProduct = { ...product };
+      const categoryDiscount = categoryDiscounts.find(
+        (catDiscount) =>
+          catDiscount?.categoryId &&
+          catDiscount.categoryId.toString() == product?.categoryId?.toString()
+      );
+      const productDiscount = productsDiscounts.find(
+        (prodDiscount) =>
+          prodDiscount?.productId &&
+          prodDiscount.productId.toString() == product?._id?.toString()
+      );
       if (categoryDiscount?.discountpercentage) {
-        newProduct.promotionPrice = product.price * ((100 - categoryDiscount.discountpercentage) / 100);
+        newProduct.promotionPrice =
+          product.price * ((100 - categoryDiscount.discountpercentage) / 100);
       }
       if (productDiscount) {
-        newProduct.promotionPrice = productDiscount?.newprice ?? newProduct.price
+        newProduct.promotionPrice =
+          productDiscount?.newprice ?? newProduct.price;
       }
       return newProduct;
-    })
-
+    });
 
     return res.status(200).json({
       success: true,
@@ -227,19 +242,19 @@ exports.getAllOrders = async (req, res) => {
     const orders =
       done === "all"
         ? await Order.find()
-          .populate("customer")
-          .populate({
-            path: "products",
-            populate: {
-              path: "product",
-              model: "Product",
-            },
-          })
-          .sort({ date: -1 })
-          .limit(limit * 1)
-          .skip((page - 1) * limit)
+            .populate("customer")
+            .populate({
+              path: "products",
+              populate: {
+                path: "product",
+                model: "Product",
+              },
+            })
+            .sort({ date: -1 })
+            .limit(limit * 1)
+            .skip((page - 1) * limit)
         : done === "false"
-          ? await Order.find({
+        ? await Order.find({
             $or: [{ status: 0 }, { status: 1 }, { status: 3 }],
           })
             .populate("customer")
@@ -253,7 +268,7 @@ exports.getAllOrders = async (req, res) => {
             .sort({ date: -1 })
             .limit(limit * 1)
             .skip((page - 1) * limit)
-          : await Order.find({ status: 2 })
+        : await Order.find({ status: 2 })
             .populate("customer")
             .populate({
               path: "products",
@@ -401,7 +416,7 @@ exports.executeDeliveryOccur = async (req, res) => {
     ]);
 
     const bulkUpsertOps = [];
-    const inserts = []
+    const inserts = [];
 
     const ordersToCreate = [...orders].map((current) => {
       let order = { ...current }; //clone current order
@@ -436,7 +451,11 @@ exports.executeDeliveryOccur = async (req, res) => {
         });
       } else {
         // if not comin run, create new one with the new order id
-        inserts.push({ date: formatedOrderDate, orders: [order._id], route: customerRouteId })
+        inserts.push({
+          date: formatedOrderDate,
+          orders: [order._id],
+          route: customerRouteId,
+        });
         // bulkUpsertOps.push({
         //   insertOne: {
         //     document: {
@@ -459,7 +478,7 @@ exports.executeDeliveryOccur = async (req, res) => {
     });
     let createdOrders = await Order.insertMany(ordersToCreate);
     res.status(200).json({ orders: createdOrders }); //send created order to the client
-    await Promise.all([Run.bulkWrite(bulkUpsertOps), Run.insertMany(inserts)]) // create or update Runs
+    await Promise.all([Run.bulkWrite(bulkUpsertOps), Run.insertMany(inserts)]); // create or update Runs
   } catch (err) {
     console.log("err", err);
   }

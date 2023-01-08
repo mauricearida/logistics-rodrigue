@@ -18,42 +18,4 @@ const UserSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-UserSchema.statics.isThisEmailInUse = async function (email) {
-  if (!email) throw new Error("Invalid Email");
-  try {
-    const user = await this.findOne({ email });
-    if (user) return false;
-    return true;
-  } catch (error) {
-    console.error(`error inside isThisEmailInUse method`, error.message);
-    return false;
-  }
-};
-
-UserSchema.statics.isThisUsernameInUse = async function (name) {
-  if (!name) throw new Error("Please enter your username");
-  try {
-    const user = await this.findOne({ name });
-    if (user) return false;
-    return true;
-  } catch (error) {
-    console.error(`error inside isThisUsernameInUse method`, error.message);
-    return false;
-  }
-};
-
-UserSchema.statics.isThisPhoneInUse = async function (phone) {
-  if (!phone) throw new Error("Please enter your phone number");
-  try {
-    const user = await this.findOne({ phone });
-    console.log("user", user);
-    console.log("phone", phone);
-    if (user) return false;
-    return true;
-  } catch (error) {
-    console.error(`error inside isThisUsernameInUse method`, error.message);
-    return false;
-  }
-};
-
 module.exports = mongoose.model("User", UserSchema);

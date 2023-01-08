@@ -7,10 +7,9 @@ exports.createOrganization = async (req, res) => {
     const { name } = req.body;
     const newOrganization = new Organization(req.body);
 
-    const isNewOrganizationName =
-      await Organization.isThisOrganizationNameInUse(name);
+    const isNewOrganizationName = await Organization.findOne({ name });
 
-    if (!isNewOrganizationName)
+    if (isNewOrganizationName)
       return res.status(400).json({
         success: false,
         message: "This organization name is already in use",

@@ -15,27 +15,14 @@ const VehicleSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-VehicleSchema.statics.isThisPlateInUse = async function (plate) {
-  if (!plate) throw new Error("Invalid Plate");
-  try {
-    const vehicle = await this.findOne({ plate });
-    if (vehicle) return false;
-    return true;
-  } catch (error) {
-    console.error(`error inside isThisPlateInUse method`, error.message);
-    return false;
-  }
-};
-
-
 VehicleSchema.methods.isAvailable = async function () {
   try {
     const run = await Run.exists({ vehicle: this._id, status: { $lte: 1 } })
     return !Boolean(run)
   } catch (e) {
-    return true
+    return true;
   }
-}
+};
 
 VehicleSchema.statics.getAvailables = async function () {
   try {
@@ -69,8 +56,8 @@ VehicleSchema.statics.getAvailables = async function () {
     ])
     return vehicles
   } catch (e) {
-    return null
+    return null;
   }
-}
+};
 
 module.exports = mongoose.model("Vehicle", VehicleSchema);

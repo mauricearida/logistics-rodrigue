@@ -47,8 +47,8 @@ exports.createproduct = async (req, res) => {
 
     console.log("req.body", req.body);
 
-    const isNewProductCode = await Products.isThisCodeInUse(assignedCode);
-    if (!isNewProductCode)
+    const isNewProductCode = await Products.findOne({ assignedCode });
+    if (isNewProductCode)
       return res.status(400).json({
         success: false,
         message:
@@ -184,35 +184,35 @@ exports.getTopOrderedProducts = async (req, res) => {
     const total = Number(req.query?.total) || 10;
     let topProducts = await Products.aggregate([
       {
-        "$lookup": {
-          from: 'orders',
-          foreignField: 'products.product',
-          localField: '_id',
-          as: 'orders'
-        }
+        $lookup: {
+          from: "orders",
+          foreignField: "products.product",
+          localField: "_id",
+          as: "orders",
+        },
       },
       {
-        "$unwind": {
+        $unwind: {
           path: "$orders",
-          preserveNullAndEmptyArrays: true
-        }
+          preserveNullAndEmptyArrays: true,
+        },
       },
       {
-        "$unwind": "$orders.products"
+        $unwind: "$orders.products",
       },
       {
-        "$group": {
+        $group: {
           _id: "$_id",
-          name: { $first: '$name' },
-          "totalOrdersQuantity": { "$sum": "$orders.products.quantity" },
-        }
+          name: { $first: "$name" },
+          totalOrdersQuantity: { $sum: "$orders.products.quantity" },
+        },
       },
-      { "$sort": { "totalOrdersQuantity": -1 } },
-      { "$limit": total }
-    ])
-    const names = topProducts.map((prod) => prod.name)
-    const ordersQuantity = topProducts.map((prod) => prod.totalOrdersQuantity)
-    res.json({ data: ordersQuantity, labels: names })
+      { $sort: { totalOrdersQuantity: -1 } },
+      { $limit: total },
+    ]);
+    const names = topProducts.map((prod) => prod.name);
+    const ordersQuantity = topProducts.map((prod) => prod.totalOrdersQuantity);
+    res.json({ data: ordersQuantity, labels: names });
   } catch (err) {
     await log(err);
     res.status(500).json(err);

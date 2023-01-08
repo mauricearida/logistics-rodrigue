@@ -4,37 +4,6 @@ const { log } = require("../helpers/Loger");
 const dayjs = require("dayjs");
 const moment = require("moment");
 
-exports.getLastMonthSales = async (req, res) => {
-  console.clear();
-  const date = new Date();
-  const lastMonth = new Date(date.setMonth(date.getMonth() - 1));
-  const previousMonth = new Date(new Date().setMonth(lastMonth.getMonth() - 1));
-  try {
-    // const income = await Order.aggregate([
-    //   { $match: { createdAt: { $gte: previousMonth } } },
-    //   {
-    //     $project: {
-    //       month: { $month: "$createdAt" },
-    //       sales: "$amount",
-    //       status: 2,
-    //     },
-    //   },
-    //   {
-    //     $group: {
-    //       _id: "$month",
-    //       total: { $sum: "$sales" },
-    //     },
-    //   },
-    // ]);
-    // const savedRun = await newRun.save();
-    //  res.status(200).json(savedRun);
-  } catch (err) {
-    console.log("getSalesByDay err", err);
-    await log(err);
-    res.status(500).json(err);
-  }
-};
-
 exports.getSalesByDay = async (req, res) => {
   console.clear();
   const { date } = req.query;
@@ -58,7 +27,6 @@ exports.getSalesByDay = async (req, res) => {
     res.status(500).json(err);
   }
 };
-
 exports.getOrdersByUserId = async (req, res) => {
   let userId = req.params.id;
   try {
@@ -71,12 +39,11 @@ exports.getOrdersByUserId = async (req, res) => {
 
     res.status(200).json({ success: true, totalIncome, orders });
   } catch (err) {
-    console.log("getSalesByDay err", err);
+    console.log("getOrdersByUserId err", err);
     await log(err);
     res.status(500).json(err);
   }
 };
-
 exports.getSalesMonth = async (req, res) => {
   console.clear();
   const { date } = req.query;
@@ -95,12 +62,11 @@ exports.getSalesMonth = async (req, res) => {
     }
     res.status(200).json({ success: true, totalIncome });
   } catch (err) {
-    console.log("getSalesByDay err", err);
+    console.log("getSalesMonth err", err);
     await log(err);
     res.status(500).json(err);
   }
 };
-
 exports.getSalesByDateRange = async (req, res) => {
   try {
     const to1 = moment(new Date(req.query.to1));
@@ -108,7 +74,6 @@ exports.getSalesByDateRange = async (req, res) => {
     const days = Number(req.query.days || 30);
     const previousPeriod1 = moment(to1).subtract(days, "days");
     const previousPeriod2 = moment(to2).subtract(days, "days");
-    // console.log(previousPeriod2.toDate(), to2.toDate());
     const orders = await Order.aggregate([
       {
         $match: {
@@ -116,7 +81,7 @@ exports.getSalesByDateRange = async (req, res) => {
             { date: { $gte: previousPeriod1.toDate(), $lte: to1.toDate() } },
             { date: { $gte: previousPeriod2.toDate(), $lte: to2.toDate() } },
           ],
-          status: 2
+          status: 2,
         },
       },
       {
@@ -155,23 +120,15 @@ exports.getSalesByDateRange = async (req, res) => {
 
     res.status(200).json({ labels, dataset1, dataset2 });
   } catch (err) {
-    console.log("getSalesByDay err", err);
+    console.log("getSalesByDateRange err", err);
     await log(err);
     res.status(500).json(err);
   }
 };
-
 exports.getSalesPerUser = async (req, res) => {
   console.clear();
-  // const { doneones } = req.query;
   try {
-    //  const orders = await Order.find({ status: 2 });
-
     const users = await User.find();
-    const orders = await Order.find();
-    let usersArray = [];
-    let ordersArray = [];
-
     for (let i = 0; i < users.length; i++) {
       const data = await Order.aggregate([
         {
@@ -184,8 +141,6 @@ exports.getSalesPerUser = async (req, res) => {
         console.log(`data ${users[i]._id}`, data);
       }
     }
-
-    //   console.log("usersArray", usersArray);
   } catch (err) {
     console.log("err", err);
   }
