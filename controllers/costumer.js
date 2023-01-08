@@ -167,6 +167,11 @@ exports.getTopCustomers = async (req, res) => {
         },
       },
       {
+        $match: {
+          'orders.status': 2,
+        },
+      },
+      {
         $group: {
           _id: "$_id",
           name: { $first: "$customername" },
