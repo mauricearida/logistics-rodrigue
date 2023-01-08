@@ -53,29 +53,4 @@ const CustomerSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-CustomerSchema.statics.isThisBusinessNameInUse = async function (businessname) {
-  if (!businessname)
-    throw new Error("Please ente a business name for the product");
-  try {
-    const customer = await this.findOne({ businessname });
-    if (customer) return false;
-    return true;
-  } catch (error) {
-    console.error(`error inside isThisBusinessNameInUse method`, error.message);
-    return false;
-  }
-};
-
-CustomerSchema.statics.isThisEmailInUse = async function (email) {
-  if (!email) throw new Error("Please ente an email for this customer");
-  try {
-    const customer = await this.findOne({ email });
-    if (customer) return false;
-    return true;
-  } catch (error) {
-    console.error(`error inside isThisCodeInUse method`, error.message);
-    return false;
-  }
-};
-
 module.exports = mongoose.model("Customer", CustomerSchema);
