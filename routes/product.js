@@ -9,6 +9,7 @@ const {
   getproductsPaginated,
   findProductsByTextSearch,
   getTopOrderedProducts,
+  getTopProductsByCategory,
 } = require("../controllers/products");
 const {
   validateMongoId,
@@ -20,6 +21,7 @@ const { verifyTokenAndAdmin } = require("../middlewares/verifyToken");
 router.route("/updatecount").put(verifyTokenAndAdmin, updateCount);
 router.route("/find").post(verifyTokenAndAdmin, findProductsByTextSearch);
 router.route("/get-top").get(verifyTokenAndAdmin, getTopOrderedProducts);
+router.route("/get-top-by-category").get(verifyTokenAndAdmin, getTopProductsByCategory);
 
 router
   .route("/")

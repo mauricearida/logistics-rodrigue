@@ -1,6 +1,7 @@
 const Products = require("../models/Products");
 const { log } = require("../helpers/Loger");
 const Sharedrecords = require("../models/Sharedrecords");
+const Category = require("../models/Category");
 
 exports.updateCount = async (req, res) => {
   try {
@@ -181,7 +182,7 @@ exports.findProductsByTextSearch = async (req, res) => {
 
 exports.getTopOrderedProducts = async (req, res) => {
   try {
-    const total = Number(req.query?.total) || 10;
+    const total = Number(req.query?.total || 10);
     let topProducts = await Products.aggregate([
       {
         $lookup: {
@@ -213,6 +214,89 @@ exports.getTopOrderedProducts = async (req, res) => {
     const names = topProducts.map((prod) => prod.name);
     const ordersQuantity = topProducts.map((prod) => prod.totalOrdersQuantity);
     res.json({ data: ordersQuantity, labels: names });
+  } catch (err) {
+    await log(err);
+    res.status(500).json(err);
+  }
+};
+
+
+exports.getTopProductsByCategory = async (req, res) => {
+  try {
+    const total = Number(req.query?.total || 5);
+    const topProducts = await Category.aggregate([
+
+      {
+        $lookup: {
+          from: 'products',
+          foreignField: 'categoryId',
+          localField: '_id',
+          let: { catId: '$_id' },
+          pipeline: [
+            {
+              $match: { '$expr': { '$eq': ['$categoryId', '$$catId'] } }
+            },
+            {
+              $lookup: {
+                from: 'orders',
+                localField: '_id',
+                foreignField: 'products.product',
+                as: 'product.orders'
+              }
+            },
+            {
+              $unwind: {
+                path: '$product.orders'
+              }
+            },
+            {
+              $unwind: {
+                path: '$product.orders.products'
+              }
+            },
+            {
+              $match: { '$expr': { '$eq': ['$product.orders.products.product', '$_id'] } }
+            },
+            {
+              $group: {
+                _id: "$_id",
+                name: { $first: '$name' },
+                totalOrders: { $sum: '$product.orders.products.quantity' }
+              }
+            },
+            {
+              $sort: { totalOrders: -1 }
+            },
+            {
+              $limit: total
+            }
+          ],
+          as: 'product',
+        }
+      },
+      {
+        $unwind: {
+          path: '$product',
+          preserveNullAndEmptyArrays: true
+        }
+      },
+      {
+        $group: {
+          _id: '$_id',
+          name: { $first: '$name' },
+          products: { $push: { name: '$product.name', _id: '$product._id', total: '$product.totalOrders' } },
+          totalOrders: { $sum: '$product.totalOrders' }
+        }
+      },
+    ])
+    const response = topProducts.map((productCategory) => {
+      return {
+        title: productCategory.name,
+        labels: productCategory.products.map((product) => product.name).filter(a => a),
+        data: productCategory.products.map((product) => product.total / productCategory.totalOrders * 100).filter(a => a),
+      }
+    })
+    res.json(response);
   } catch (err) {
     await log(err);
     res.status(500).json(err);
