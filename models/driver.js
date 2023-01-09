@@ -20,40 +20,5 @@ DriverSchema.methods.isAvailable = async function () {
 }
 
 
-DriverSchema.statics.getAvailables = async function () {
-  try {
-    const drivers = await this.aggregate([
-      {
-        $lookup: {
-          from: 'runs',
-          foreignField: 'driver',
-          localField: '_id',
-          as: 'run'
-        },
-      },
-      {
-        $unwind: {
-          path: "$run",
-          preserveNullAndEmptyArrays: true
-        },
-      },
-      {
-        $match: {
-          $or: [
-            {
-              run: { $exists: false }
-            },
-            {
-              'run.status': { $lte: 0 }
-            }
-          ]
-        }
-      }
-    ])
-    return drivers
-  } catch (e) {
-    return null
-  }
-}
 
 module.exports = mongoose.model("Driver", DriverSchema);
