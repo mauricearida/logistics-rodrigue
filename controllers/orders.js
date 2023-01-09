@@ -143,8 +143,6 @@ exports.createOrder = async (req, res) => {
         .json({ success: false, message: "Customer not found" });
     let customerRouteId = ourCustomer.routeId.toString();
     const comingRunsArray = await getComingRuns(customerRouteId);
-    // we are getting the runs with status 0 and 1 so we have to terminate runs by end of day if the admin did not
-    //wen badna nhetetla coda hayde ya Emile
     let orderDate = moment(date).format("L");
 
     const existComingRun = comingRunsArray.find((oneComingRun) => {
