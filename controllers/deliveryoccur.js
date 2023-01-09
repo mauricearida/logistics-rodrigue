@@ -32,7 +32,6 @@ exports.createDeliveryOccur = async (req, res) => {
     res.status(500).json(err);
   }
 };
-
 exports.updateDeliveryOccur = async (req, res) => {
   try {
     const updatedDeliveryOccur = await DeliveryOccur.findByIdAndUpdate(
@@ -54,7 +53,6 @@ exports.updateDeliveryOccur = async (req, res) => {
     res.status(500).json(err);
   }
 };
-
 exports.deleteDeliveryOccur = async (req, res) => {
   try {
     await DeliveryOccur.findByIdAndDelete(req.params.id);
@@ -65,7 +63,6 @@ exports.deleteDeliveryOccur = async (req, res) => {
     res.status(500).json(err);
   }
 };
-
 exports.getDeliveryOccur = async (req, res) => {
   try {
     const deliveryOccur = await DeliveryOccur.findById(req.params.id);
@@ -79,7 +76,6 @@ exports.getDeliveryOccur = async (req, res) => {
     res.status(500).json(err);
   }
 };
-
 exports.getAllDeliveryOccur = async (req, res) => {
   try {
     const deliveryOccur = await DeliveryOccur.find().sort({ _id: -1 });
