@@ -1,4 +1,5 @@
 const Vehicle = require("../models/Vehicle");
+const Run = require("../models/Run");
 const { log } = require("../helpers/Loger");
 
 exports.createVehicle = async (req, res) => {
@@ -40,8 +41,20 @@ exports.updateVehicle = async (req, res) => {
 };
 exports.deleteVehicle = async (req, res) => {
   try {
-    await Vehicle.findByIdAndDelete(req.params.id);
-    res.status(200).json("Vehicle has been deleted...");
+    const ordersWithThisVehicle = await Run.find({
+      vehicle: req.params.id,
+    });
+    if (ordersWithThisVehicle?.length)
+      return res.status(403).json({
+        success: false,
+        message: "Cannot delete vehicle when associated to a run",
+      });
+
+    await Run.findByIdAndDelete(req.params.id);
+    return res.status(200).json({
+      success: false,
+      message: "Run has been successfully deleted...",
+    });
   } catch (err) {
     await log(err);
     res.status(500).json(err);

@@ -1,4 +1,5 @@
 const Driver = require("../models/driver");
+const Run = require("../models/Run");
 const Sharedrecords = require("../models/Sharedrecords");
 const { log } = require("../helpers/Loger");
 
@@ -55,8 +56,20 @@ exports.updateDriver = async (req, res) => {
 };
 exports.deleteDriver = async (req, res) => {
   try {
+    const runWithThisDriver = await Run.find({
+      driver: req.params.id,
+    });
+    if (runWithThisDriver.length)
+      return res.status(403).json({
+        success: false,
+        message: "Cannot delete driver when associated with a run",
+      });
+
     await Driver.findByIdAndDelete(req.params.id);
-    res.status(200).json("Driver has been deleted...");
+    return res.status(200).json({
+      success: false,
+      message: "Driver has been successfully deleted...",
+    });
   } catch (err) {
     await log(err);
     res.status(500).json(err);

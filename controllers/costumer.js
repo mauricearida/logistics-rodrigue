@@ -1,4 +1,5 @@
 const Customer = require("../models/Customer");
+const Order = require("../models/Orders");
 const Sharedrecords = require("../models/Sharedrecords");
 const { log } = require("../helpers/Loger");
 
@@ -68,8 +69,18 @@ exports.updateCostumer = async (req, res) => {
 };
 exports.deleteCostumer = async (req, res) => {
   try {
-    const customer = await Customer.findByIdAndDelete(req.params.id);
-    res.status(200).json(customer);
+    const ordersWithCustomer = await Order.find({ customer: req.params.id });
+    if (ordersWithCustomer?.length)
+      return res.status(403).json({
+        success: false,
+        message: "Cannot delete customer when associated to an order",
+      });
+
+    await Customer.findByIdAndDelete(req.params.id);
+    return res.status(200).json({
+      success: false,
+      message: "Customer has been successfully deleted...",
+    });
   } catch (err) {
     await log(err);
     res.status(500).json(err);
@@ -168,7 +179,7 @@ exports.getTopCustomers = async (req, res) => {
       },
       {
         $match: {
-          'orders.status': 2,
+          "orders.status": 2,
         },
       },
       {
