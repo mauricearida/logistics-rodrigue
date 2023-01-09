@@ -1,5 +1,6 @@
 const DeliveryOccur = require("../models/Deliveriesoccur");
 const Sharedrecords = require("../models/Sharedrecords");
+const Customer = require("../models/Customer");
 const { log } = require("../helpers/Loger");
 
 exports.createDeliveryOccur = async (req, res) => {
@@ -55,9 +56,21 @@ exports.updateDeliveryOccur = async (req, res) => {
 };
 exports.deleteDeliveryOccur = async (req, res) => {
   try {
-    await DeliveryOccur.findByIdAndDelete(req.params.id);
+    const customerWithThisDeliveryOccur = await Customer.find({
+      deliveryoccur: req.params.id,
+    });
+    if (customerWithThisDeliveryOccur.length)
+      return res.status(403).json({
+        success: false,
+        message:
+          "Cannot delete this delivery occur option when associated with a customer",
+      });
 
-    res.status(200).json("Delivery occur method has been deleted...");
+    await DeliveryOccur.findByIdAndDelete(req.params.id);
+    return res.status(200).json({
+      success: false,
+      message: "Delivery occur option has been successfully deleted...",
+    });
   } catch (err) {
     await log(err);
     res.status(500).json(err);

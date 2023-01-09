@@ -1,4 +1,5 @@
 const User = require("../models/User");
+const Order = require("../models/Orders");
 const { log } = require("../helpers/Loger");
 
 exports.updateUser = async (req, res) => {
@@ -30,8 +31,20 @@ exports.updateUser = async (req, res) => {
 
 exports.deteleUser = async (req, res) => {
   try {
+    const ordersWithThisUser = await Order.find({
+      initiateduser: req.params.id,
+    });
+    if (ordersWithThisUser?.length)
+      return res.status(403).json({
+        success: false,
+        message: "Cannot delete user when associated to an order",
+      });
+
     await User.findByIdAndDelete(req.params.id);
-    res.status(200).json("User has been deleted...");
+    return res.status(200).json({
+      success: false,
+      message: "User has been successfully deleted...",
+    });
   } catch (err) {
     await log(err);
     res.status(500).json(err);
