@@ -23,7 +23,6 @@ exports.createOrganization = async (req, res) => {
     res.status(500).json(err);
   }
 };
-
 exports.addCustomerToOrganization = async (req, res) => {
   try {
     console.clear();
@@ -60,7 +59,6 @@ exports.addCustomerToOrganization = async (req, res) => {
     console.log("addCustomerToOrganization err", err);
   }
 };
-
 exports.updateOrganization = async (req, res) => {
   try {
     const updatedOrganization = await Organization.findByIdAndUpdate(
@@ -81,7 +79,6 @@ exports.updateOrganization = async (req, res) => {
     res.status(500).json(err);
   }
 };
-
 exports.deleteOrganization = async (req, res) => {
   try {
     const organization = await Organization.findById(req.params.id);
@@ -92,7 +89,7 @@ exports.deleteOrganization = async (req, res) => {
       });
     }
     if (organization.customers.length) {
-      return res.status(399).json({
+      return res.status(403).json({
         success: false,
         message:
           "Organization already has customers in it, remove them if you want to delete it",
@@ -107,7 +104,6 @@ exports.deleteOrganization = async (req, res) => {
     res.status(500).json(err);
   }
 };
-
 exports.getOrganization = async (req, res) => {
   try {
     const organization = await Organization.findById(req.params.id).populate(
@@ -123,7 +119,6 @@ exports.getOrganization = async (req, res) => {
     res.status(500).json(err);
   }
 };
-
 exports.getAllOrganizations = async (req, res) => {
   try {
     const organizations = await Organization.find()

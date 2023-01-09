@@ -1,7 +1,10 @@
 const Products = require("../models/Products");
+const Order = require("../models/Orders");
 const { log } = require("../helpers/Loger");
 const Sharedrecords = require("../models/Sharedrecords");
 const Category = require("../models/Category");
+
+const { default: mongoose } = require("mongoose");
 
 exports.createproduct = async (req, res) => {
   const {
@@ -69,7 +72,6 @@ exports.createproduct = async (req, res) => {
     }
   }
 };
-
 exports.updateProduct = async (req, res) => {
   try {
     const updatedProduct = await Products.findByIdAndUpdate(
@@ -89,17 +91,47 @@ exports.updateProduct = async (req, res) => {
     res.status(500).json(err);
   }
 };
-
 exports.deleteProduct = async (req, res) => {
   try {
+    const productsFromOrder = await Order.aggregate([
+      {
+        $lookup: {
+          from: "products",
+          foreignField: "_id",
+          localField: "products.product",
+          as: "products",
+        },
+      },
+      { $unwind: "$products" },
+      {
+        $match: {
+          "products._id": { $eq: new mongoose.Types.ObjectId(req.params.id) },
+        },
+      },
+      {
+        $project: {
+          _id: 1,
+        },
+      },
+    ]);
+
+    if (productsFromOrder.length)
+      return res.status(403).json({
+        success: false,
+        message:
+          "This Product cannot be deleted since it is associated with one or more orders",
+      });
+
     await Products.findByIdAndDelete(req.params.id);
-    res.status(200).json("Product has been deleted...");
+    return res.status(200).json({
+      success: true,
+      message: "This Product is successfully deleted",
+    });
   } catch (err) {
     await log(err);
     res.status(500).json(err);
   }
 };
-
 exports.getProduct = async (req, res) => {
   try {
     const product = await Products.findById(req.params.id).populate(
@@ -115,7 +147,6 @@ exports.getProduct = async (req, res) => {
     res.status(500).json(err);
   }
 };
-
 exports.getproductsPaginated = async (req, res) => {
   try {
     let productsCount = await Products.countDocuments();
@@ -136,7 +167,6 @@ exports.getproductsPaginated = async (req, res) => {
     res.status(500).json(err);
   }
 };
-
 exports.findProductsByTextSearch = async (req, res) => {
   const { find, page, limit } = req.query;
   try {
@@ -158,7 +188,6 @@ exports.findProductsByTextSearch = async (req, res) => {
     res.status(500).json(err);
   }
 };
-
 exports.getTopOrderedProducts = async (req, res) => {
   try {
     const total = Number(req.query?.total || 10);
@@ -198,7 +227,6 @@ exports.getTopOrderedProducts = async (req, res) => {
     res.status(500).json(err);
   }
 };
-
 exports.getTopProductsByCategory = async (req, res) => {
   try {
     const total = Number(req.query?.total || 5);

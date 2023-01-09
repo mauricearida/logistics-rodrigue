@@ -1,4 +1,5 @@
 const Paymentmethod = require("../models/Paymentmethod");
+const Customer = require("../models/Customer");
 const Sharedrecords = require("../models/Sharedrecords");
 const { log } = require("../helpers/Loger");
 
@@ -6,7 +7,6 @@ exports.createPaymentMethod = async (req, res) => {
   const newPaymentmethod = new Paymentmethod(req.body);
   const codeSequence = await Sharedrecords.findById("63663fa59b531a420083d78f");
   let codeid = codeSequence.paymentmethodcodeid;
-  console.log("paymentmethodcodeid", codeid);
   newPaymentmethod.number = codeid;
   try {
     const paymentMethodName = await Paymentmethod.findOne({
@@ -32,7 +32,6 @@ exports.createPaymentMethod = async (req, res) => {
     res.status(500).json(err);
   }
 };
-
 exports.updatePaymentMethod = async (req, res) => {
   try {
     const updatedPaymentMethod = await Paymentmethod.findByIdAndUpdate(
@@ -52,9 +51,17 @@ exports.updatePaymentMethod = async (req, res) => {
     res.status(500).json(err);
   }
 };
-
 exports.deletePaymentMethod = async (req, res) => {
   try {
+    const customersWithThisPaymentmethod = Customer.find({
+      paymentmethod: req.params.id,
+    });
+
+    if (customersWithThisPaymentmethod.length)
+      return res
+        .status(403)
+        .json("Cannot delete a payment method associated with a customer");
+
     await Paymentmethod.findByIdAndDelete(req.params.id);
     res.status(200).json("Payment method has been deleted...");
   } catch (err) {
@@ -62,7 +69,6 @@ exports.deletePaymentMethod = async (req, res) => {
     res.status(500).json(err);
   }
 };
-
 exports.getPaymentMethod = async (req, res) => {
   try {
     const paymentMethod = await Paymentmethod.findById(req.params.id);
@@ -76,7 +82,6 @@ exports.getPaymentMethod = async (req, res) => {
     res.status(500).json(err);
   }
 };
-
 exports.getAllPaymentMethods = async (req, res) => {
   try {
     const paymentMethods = await Paymentmethod.find().sort({ _id: -1 });
