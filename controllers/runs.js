@@ -1,5 +1,6 @@
 const Run = require("../models/Run");
 const { log } = require("../helpers/Loger");
+const Orders = require("../models/Orders");
 
 exports.createRun = async (req, res) => {
   const newRun = new Run(req.body);
@@ -19,7 +20,13 @@ exports.updateRun = async (req, res) => {
         $set: req.body,
       },
       { new: true }
-    );
+    ).populate('orders')
+    if (updatedRun.status >= 2) {
+      const ordersIds = updatedRun.orders.map((order) => order._id?.toString())
+      await Orders.updateMany({
+        _id: { $in: ordersIds }
+      }, { $set: { status: updatedRun.status } })
+    }
     if (updatedRun) {
       res.status(200).json(updatedRun);
     } else {
