@@ -49,7 +49,6 @@ app.use(express.json());
 app.use(compression());
 
 app.use("/api/auth", authRoute);
-
 app.use("/api/users", authRoute);
 app.use("/api/drivers", driversRoute);
 app.use("/api/runs", runsRoute);
