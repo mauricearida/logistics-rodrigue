@@ -125,6 +125,9 @@ exports.creatingOrder = [
 exports.validateName = [
   check("name").trim().not().isEmpty().withMessage("Name is missing"),
 ];
+exports.validatePhone = [
+  check("phone").trim().not().isEmpty().withMessage("Phone number is missing"),
+];
 
 // Creating Routes
 exports.creatingRoute = [

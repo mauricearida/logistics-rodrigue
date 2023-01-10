@@ -10,12 +10,19 @@ const {
   validateName,
   validateMongoId,
   validate,
+  validatePhone,
 } = require("../middlewares/validators");
 const { verifyTokenAndAdmin } = require("../middlewares/verifyToken");
 
 router
   .route("/")
-  .post(verifyTokenAndAdmin, validateName, validate, createDriver)
+  .post(
+    verifyTokenAndAdmin,
+    validatePhone,
+    validateName,
+    validate,
+    createDriver
+  )
   .get(verifyTokenAndAdmin, getAllDrivers);
 
 router
