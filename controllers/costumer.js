@@ -207,22 +207,20 @@ exports.getTopCustomers = async (req, res) => {
     );
 
     let date = new Date();
-    const formattedDate = moment(date).add(1, "days").format("L");
-    const tomorrowRuns = await Run.find({ date: formattedDate });
-    let tomorrowOrdersCount = 0;
-    let tomorrowRunsCount = tomorrowRuns.length || 0;
-    if (tomorrowRuns) {
-      for (let i = 0; i < tomorrowRuns.length; i++) {
-        tomorrowOrdersCount =
-          tomorrowOrdersCount + tomorrowRuns[i].orders.length;
-      }
-    }
+    const formattedDate = moment(date).format("L");
+    const todayRuns = await Run.find({ date: formattedDate });
+    const todayOrders = await Order.find({ date: formattedDate });
+    const todayDeliveredOrders = await Order.find({
+      date: formattedDate,
+      status: 2,
+    });
 
     res.json({
       data: totalOrdersAmount,
       labels: names,
-      tomorrowOrdersCount,
-      tomorrowRunsCount,
+      todayRuns,
+      todayOrders,
+      todayDeliveredOrders,
     });
   } catch (err) {
     await log(err);
