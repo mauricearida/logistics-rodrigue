@@ -1,7 +1,9 @@
 const Customer = require("../models/Customer");
+const Run = require("../models/Run");
 const Order = require("../models/Orders");
 const Sharedrecords = require("../models/Sharedrecords");
 const { log } = require("../helpers/Loger");
+const moment = require("moment");
 
 exports.createCostumer = async (req, res) => {
   const { businessname, email } = req.body;
@@ -160,6 +162,8 @@ exports.findCustomerByTextSearch = async (req, res) => {
   }
 };
 exports.getTopCustomers = async (req, res) => {
+  //this controller returns aside the to the top customers
+  // the order and runs scheduled to tomorrow for the dashboard
   try {
     const total = Number(req.query?.total) || 10;
     let topCustomers = await Customer.aggregate([
@@ -201,7 +205,25 @@ exports.getTopCustomers = async (req, res) => {
     const totalOrdersAmount = topCustomers.map(
       (cust) => cust.totalOrdersAmount
     );
-    res.json({ data: totalOrdersAmount, labels: names });
+
+    let date = new Date();
+    const formattedDate = moment(date).add(1, "days").format("L");
+    const tomorrowRuns = await Run.find({ date: formattedDate });
+    let tomorrowOrdersCount = 0;
+    let tomorrowRunsCount = tomorrowRuns.length || 0;
+    if (tomorrowRuns) {
+      for (let i = 0; i < tomorrowRuns.length; i++) {
+        tomorrowOrdersCount =
+          tomorrowOrdersCount + tomorrowRuns[i].orders.length;
+      }
+    }
+
+    res.json({
+      data: totalOrdersAmount,
+      labels: names,
+      tomorrowOrdersCount,
+      tomorrowRunsCount,
+    });
   } catch (err) {
     await log(err);
     res.status(500).json(err);
