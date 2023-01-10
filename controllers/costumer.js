@@ -162,7 +162,7 @@ exports.findCustomerByTextSearch = async (req, res) => {
   }
 };
 exports.getTopCustomers = async (req, res) => {
-  //this controller returns aside the to the top customers
+  // this controller returns aside the to the top customers
   // the order and runs scheduled to tomorrow for the dashboard
   try {
     const total = Number(req.query?.total) || 10;

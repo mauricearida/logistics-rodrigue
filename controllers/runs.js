@@ -20,12 +20,15 @@ exports.updateRun = async (req, res) => {
         $set: req.body,
       },
       { new: true }
-    ).populate('orders')
+    ).populate("orders");
     if (updatedRun.status >= 2) {
-      const ordersIds = updatedRun.orders.map((order) => order._id?.toString())
-      await Orders.updateMany({
-        _id: { $in: ordersIds }
-      }, { $set: { status: updatedRun.status } })
+      const ordersIds = updatedRun.orders.map((order) => order._id?.toString());
+      await Orders.updateMany(
+        {
+          _id: { $in: ordersIds },
+        },
+        { $set: { status: updatedRun.status } }
+      );
     }
     if (updatedRun) {
       res.status(200).json(updatedRun);
@@ -48,10 +51,13 @@ exports.deleteRun = async (req, res) => {
 };
 exports.getRun = async (req, res) => {
   try {
-    const run = await Run.findById(req.params.id).populate({
-      path: "orders",
-      populate: { path: "customer" },
-    });
+    const run = await Run.findById(req.params.id)
+      .populate({
+        path: "orders",
+        populate: { path: "customer" },
+      })
+      .populate("driver")
+      .populate("vehicle");
 
     if (run) {
       res.status(200).json(run);
@@ -93,7 +99,8 @@ exports.getAllRuns = async (req, res) => {
       .sort({ date: -1 })
       .populate("route")
       .populate("orders")
-      .populate("driver", { name: 1 });
+      .populate("driver", { name: 1 })
+      .populate("vehicle");
     const runCount = await Run.countDocuments();
     let objectTosend = {
       runCount,
