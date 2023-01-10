@@ -1,4 +1,5 @@
 const User = require("../models/User");
+const Driver = require("../models/driver");
 const { log } = require("../helpers/Loger");
 
 exports.getAllAdmins = async (req, res) => {
@@ -23,6 +24,23 @@ exports.getAllUsers = async (req, res) => {
         .status(404)
         .json({ success: "false", message: "There are no users yet" });
     else return res.status(200).json(users);
+  } catch (err) {
+    await log(err);
+    res.status(500).json(err);
+  }
+};
+
+exports.getAllStaff = async (req, res) => {
+  try {
+    const users = await User.find();
+    const drivers = await Driver.find();
+
+    let jsonToSend = {
+      users,
+      drivers,
+    };
+
+    return res.status(200).json({ success: true, data: jsonToSend });
   } catch (err) {
     await log(err);
     res.status(500).json(err);

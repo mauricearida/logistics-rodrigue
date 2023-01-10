@@ -18,7 +18,6 @@ exports.createRoute = async (req, res) => {
     res.status(500).json(err);
   }
 };
-
 exports.updateRoute = async (req, res) => {
   try {
     const updatedRoute = await Route.findByIdAndUpdate(
@@ -38,7 +37,6 @@ exports.updateRoute = async (req, res) => {
     res.status(500).json(err);
   }
 };
-
 exports.deleteRoute = async (req, res) => {
   try {
     await Route.findByIdAndDelete(req.params.id);
@@ -48,7 +46,6 @@ exports.deleteRoute = async (req, res) => {
     res.status(500).json(err);
   }
 };
-
 exports.getRouteRoute = async (req, res) => {
   try {
     const route = await Route.findById(req.params.id);
@@ -62,7 +59,6 @@ exports.getRouteRoute = async (req, res) => {
     res.status(500).json(err);
   }
 };
-
 exports.getAllRoutes = async (req, res) => {
   try {
     const routes = await Route.find().sort({ _id: -1 });
