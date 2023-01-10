@@ -208,12 +208,15 @@ exports.getTopCustomers = async (req, res) => {
 
     let date = new Date();
     const formattedDate = moment(date).format("L");
-    const todayRuns = await Run.find({ date: formattedDate });
-    const todayOrders = await Order.find({ date: formattedDate });
-    const todayDeliveredOrders = await Order.find({
+    const todayRunsArray = await Run.find({ date: formattedDate });
+    const todayOrdersArray = await Order.find({ date: formattedDate });
+    const todayDeliveredOrdersArray = await Order.find({
       date: formattedDate,
       status: 2,
     });
+    let todayDeliveredOrders = todayDeliveredOrdersArray.length || 0;
+    let todayOrders = todayOrdersArray.length || 0;
+    let todayRuns = todayRunsArray.length || 0;
 
     res.json({
       data: totalOrdersAmount,
