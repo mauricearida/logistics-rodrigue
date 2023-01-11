@@ -17,7 +17,7 @@ exports.createCostumer = async (req, res) => {
   }
   newCustomer.codeid = codeid;
 
-  const businessnameUser = await User.findOne({ businessname });
+  const businessnameUser = await Customer.findOne({ businessname });
   if (businessnameUser) {
     return res.status(400).json({
       success: false,
@@ -26,7 +26,7 @@ exports.createCostumer = async (req, res) => {
     });
   }
 
-  const emailUser = await User.findOne({ email });
+  const emailUser = await Customer.findOne({ email });
   if (emailUser) {
     return res.status(400).json({
       success: false,
