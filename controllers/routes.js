@@ -43,12 +43,10 @@ exports.deleteRoute = async (req, res) => {
     const routeHasCustomers = await Customer.find({ routeId: req.params.id });
 
     if (routeHasCustomers.length)
-      return res
-        .status(403)
-        .json({
-          success: false,
-          message: "Route is associated with customers, cannot deleted",
-        });
+      return res.status(403).json({
+        success: false,
+        message: "Route is associated with customers, cannot be deleted",
+      });
 
     await Route.findByIdAndDelete(req.params.id);
     res.status(200).json("Route has been deleted...");
